@@ -4,9 +4,9 @@ CCC = g++
 #CCCFLAGS = -Wall -g -std=c++11 -lpthread -lX11
 CCCFLAGS = -Wall -g -std=c++11 -lpthread
 
-all : main
+all : plc
 
-main : main.o symbol.o
+main : plc.o symbol.o
 	$(CCC) $(CCCFLAGS) -o $@ $^
 
 %.o : %.cc
