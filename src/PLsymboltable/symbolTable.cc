@@ -43,7 +43,7 @@ Attribute SymbolTable::get(const int &key)
   }
   if (table[hash] == NULL)
   {
-    return -1;
+    return Attribute();
   }
   else
   {

@@ -11,6 +11,10 @@
 using namespace std;
 
 // Constructor
+Attribute::Attribute()
+{
+  token = Token();
+}
 Attribute::Attribute(const Token &t)
 {
   token = t;
