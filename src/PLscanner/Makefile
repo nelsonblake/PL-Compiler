@@ -6,7 +6,7 @@ CCCFLAGS = -Wall -g -std=c++11 -lpthread
 
 all : plc
 
-main : plc.o symbol.o
+plc : plc.o symbol.o
 	$(CCC) $(CCCFLAGS) -o $@ $^
 
 %.o : %.cc
@@ -18,4 +18,4 @@ clean:
 	rm -f *.o *~ *% *# .#*
 
 clean-all: clean
-	rm -f main
+	rm -f plc

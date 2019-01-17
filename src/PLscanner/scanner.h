@@ -18,10 +18,9 @@ class Scanner
   Scanner();
 
   // Public Methods
-  Token getToken()
+  Token getToken();
 
   // Data Members
-  
 };
 
 #endif
