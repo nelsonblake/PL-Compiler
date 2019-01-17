@@ -1,28 +1,18 @@
 //************************************************************************************
 // CPSC 4600
 // PL Language Compiler
-// Symbol Table Interface File
+// Symbol Table Entry Attribute Implementation
 // Written By: Eric Den Haan and Blake Nelson
 // Inspired by: http://www.algolist.net/Data_structures/Hash_table/Simple_example
+// TODO: Expand
 //************************************************************************************
 
-#ifndef SYMBOLTABLE_H
-#define SYMBOLTABLE_H
-
-#include "../PLScanner/token.h"
+#include "./attribute.h"
 
 using namespace std;
 
-const int TABLE_SIZE = 997;
-
-class SymbolTable
+// Constructor
+Attribute::Attribute(const Token& t)
 {
-  // Constructors
-
-  // Public Methods
-
-  // Data Members
-
-};
-
-#endif
+  token = t;
+}
