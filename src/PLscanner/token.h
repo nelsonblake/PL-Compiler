@@ -16,7 +16,6 @@ using namespace std;
 class Token
 {
   // Constructors
-  Token();
   Token(const Symbol&);
   Token(const Symbol&, const string&);
 
