@@ -9,7 +9,8 @@
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
-#include "../PLScanner/token.h"
+#include './attribute.h'
+#include './symbolTableEntry.h'
 
 using namespace std;
 
@@ -17,12 +18,17 @@ const int TABLE_SIZE = 997;
 
 class SymbolTable
 {
+public:
   // Constructors
+  SymbolTable();
 
   // Public Methods
+  int get(const int&);
+  void put(const int&, const Attribute&);
 
+private:
   // Data Members
-
+  **SymbolTableEntry table;
 };
 
 #endif
