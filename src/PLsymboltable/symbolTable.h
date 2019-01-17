@@ -9,8 +9,8 @@
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
-#include './attribute.h'
-#include './symbolTableEntry.h'
+#include "./attribute.h"
+#include "./symbolTableEntry.h"
 
 using namespace std;
 
@@ -22,13 +22,16 @@ public:
   // Constructors
   SymbolTable();
 
+  // Destructor
+  ~SymbolTable();
+
   // Public Methods
-  int get(const int&);
-  void put(const int&, const Attribute&);
+  Attribute get(const int &);
+  void put(const int &, const Attribute &);
 
 private:
   // Data Members
-  **SymbolTableEntry table;
+  SymbolTableEntry **table;
 };
 
 #endif

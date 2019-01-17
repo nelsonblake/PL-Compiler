@@ -11,19 +11,19 @@
 using namespace std;
 
 // Constructors
-SymbolTableEntry(const int& k, const Attribute& attr)
+SymbolTableEntry::SymbolTableEntry(const int &k, const Attribute &attr)
 {
   key = k;
   attributes = attr;
 }
 
 // Getters
-int getKey()
+int SymbolTableEntry::getKey()
 {
   return key;
 }
 
-int getAttributes()
+Attribute SymbolTableEntry::getAttributes()
 {
   return attributes;
 }

@@ -9,7 +9,7 @@
 #ifndef SYMBOLTABLEENTRY_H
 #define SYMBOLTABLEENTRY_H
 
-#include "attribute.h"
+#include "./attribute.h"
 
 using namespace std;
 
@@ -17,11 +17,11 @@ class SymbolTableEntry
 {
 public:
   // Constructors
-  SymbolTableEntry(const int&, const Attribute&);
+  SymbolTableEntry(const int &, const Attribute &);
 
   // Public Methods
   int getKey();
-  int getAttributes();
+  Attribute getAttributes();
 
 private:
   // Data Members
