@@ -1,6 +1,6 @@
 # PLcompiler
 Compiler design project for PL language (CPSC 4600)
 
-Time Tracking:
+##Time Tracking:
 15/1/19 4 hours
 16/1/19 2.5 hours
