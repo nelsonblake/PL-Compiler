@@ -13,6 +13,7 @@ using namespace std;
 SymbolTable::SymbolTable()
 {
   table = vector<Token>(TABLE_SIZE);
+  occupiedCells = 0;
 }
 
 // Destructor
@@ -51,4 +52,10 @@ bool SymbolTable::isFull()
 int SymbolTable::getOccupiedCells()
 {
   return occupiedCells;
+}
+
+// hash Method
+// The hash function for the Symbol Table
+int SymbolTable::hash(const string &lexeme)
+{
 }
