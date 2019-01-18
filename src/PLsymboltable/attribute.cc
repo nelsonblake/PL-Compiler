@@ -16,7 +16,7 @@ Attribute::Attribute()
   value = -1;
   lexeme = "";
 }
-Attribute::Attribute(const int &v, const string &l)
+Attribute::Attribute(const int &v, const string &l = "")
 {
   value = v;
   lexeme = l;
