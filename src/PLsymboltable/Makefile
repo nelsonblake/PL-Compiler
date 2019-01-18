@@ -8,7 +8,6 @@ CCCFLAGS = -Wall -g -std=c++11 -lpthread
 	$(CCC) -c $(CCCFLAGS) $<
 
 symbolTable.o : symbolTable.h
-symbolTableEntry.o : symbolTableEntry.h
 token.o : attribute.h token.h
 
 clean:

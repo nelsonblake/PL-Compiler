@@ -10,7 +10,11 @@
 
 enum Symbol
 {
-  BEGIN = 256,
+  // Identifier and Number
+  ID = 256,
+  NUM,
+  // Reserved Words
+  BEGIN,
   END,
   CONST,
   ARRAY,
@@ -27,16 +31,7 @@ enum Symbol
   OD,
   FALSE,
   TRUE,
-  ID,
-  NUM,
-  PERIOD,
-  COMMA,
-  OPEN_SQUARE_BRACKET,
-  CLOSE_SQUARE_BRACKET,
-  OPEN_PARENTHESIS,
-  CLOSE_PARENTHESIS,
-  GUARDED_COMMAND,
-  COMMENT,
+  // Operators
   AND_OPERATOR,
   OR_OPERATOR,
   NOT_OPERATOR,
@@ -50,12 +45,20 @@ enum Symbol
   MODULUS_OPERATOR,
   ASSIGNMENT_OPERATOR,
   ARROW_OPERATOR,
-  // Utility symbols
+  // Other Symbols
+  PERIOD,
+  COMMA,
+  OPEN_SQUARE_BRACKET,
+  CLOSE_SQUARE_BRACKET,
+  OPEN_PARENTHESIS,
+  CLOSE_PARENTHESIS,
+  GUARDED_COMMAND,
+  COMMENT,
+  // Utility Symbols
   NONAME,       // Empty Token
   INVALID_ID,   // ID error indicator
   INVALID_CHAR, // Char error indicator
   INVALID_NUM,  // Overflow
   NEWLINE
-
 };
 #endif
