@@ -1,7 +1,7 @@
 //************************************************************************************
 // CPSC 4600
 // PL Language Compiler
-// Symbol Table Implemenation File
+// Symbol Table Implementation File
 // Written By: Eric Den Haan and Blake Nelson
 //************************************************************************************
 

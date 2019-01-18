@@ -1,7 +1,7 @@
 //************************************************************************************
 // CPSC 4600
 // PL Language Compiler
-// Symbol Table Entry Attribute Implementation
+// Symbol Table Entry Attribute Implementation File
 // Written By: Eric Den Haan and Blake Nelson
 // TODO: Expand
 //************************************************************************************
