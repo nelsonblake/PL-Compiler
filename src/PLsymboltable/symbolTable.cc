@@ -3,6 +3,7 @@
 // PL Language Compiler
 // Symbol Table Implementation File
 // Written By: Eric Den Haan and Blake Nelson
+// Inspired By: https://gist.github.com/ducngtuan/4332979
 //************************************************************************************
 
 #include "./symbolTable.h"
@@ -23,6 +24,7 @@ SymbolTable::~SymbolTable()
 
 // init Method
 // Initialize the Symbol Table with all reserved words
+// Fill remaining space with NONAME Empty Token
 void SymbolTable::init()
 {
 }
@@ -39,6 +41,13 @@ int SymbolTable::search(const string &lexeme)
 // If the lexeme already exists, return the position in the table
 int SymbolTable::insert(const string &lexeme)
 {
+  int location = search(lexeme);
+  if (location != -1)
+  {
+    return location;
+  }
+
+  occupiedCells++;
 }
 
 // isFull Method
@@ -58,4 +67,30 @@ int SymbolTable::getOccupiedCells()
 // The hash function for the Symbol Table
 int SymbolTable::hash(const string &lexeme)
 {
+  int value = 0;
+  for (int i = 0; i < lexeme.length(); i++)
+  {
+    value = 37 * value + lexeme[i];
+  }
+  return value;
+}
+
+// findIndex Method
+// Use the hash function to find the index of the new table entry
+int SymbolTable::findIndex(const string &lexeme)
+{
+  int h = hash(lexeme) % TABLE_SIZE, offset = 0, index;
+
+  while (offset < TABLE_SIZE)
+  {
+    index = (h + offset) % TABLE_SIZE;
+
+    if (table[index].getSname() == NONAME)
+    {
+      return index;
+    }
+
+    offset++;
+  }
+  return -1;
 }

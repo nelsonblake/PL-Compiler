@@ -37,6 +37,7 @@ private:
   vector<Token> table;
   int occupiedCells;
   int hash(const string &);
+  int findIndex(const string &);
 };
 
 #endif
