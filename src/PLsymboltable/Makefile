@@ -9,7 +9,7 @@ CCCFLAGS = -Wall -g -std=c++11 -lpthread
 
 symbolTable.o : symbolTable.h
 symbolTableEntry.o : symbolTableEntry.h
-attribute.o : attribute.h token.h
+token.o : attribute.h token.h
 
 clean:
 	rm -f *.o *~ *% *# .#*

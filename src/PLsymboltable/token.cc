@@ -12,11 +12,11 @@ using namespace std;
 // Constructors
 Token::Token()
 {
-  sname = INVALID;
-  sval = "";
+  sname = NONAME;
+  sval = Attribute();
 }
 
-Token::Token(const Symbol &symbol, const string &sv)
+Token::Token(const Symbol &symbol, const Attribute &sv)
 {
   sname = symbol;
   sval = sv;
@@ -33,12 +33,12 @@ void Token::setSname(const Symbol &symbol)
   sname = symbol;
 }
 
-string Token::getSval()
+Attribute Token::getSval()
 {
   return sval;
 }
 
-void Token::setSval(const string &sv)
+void Token::setSval(const Attribute &sv)
 {
   sval = sv;
 }

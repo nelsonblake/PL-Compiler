@@ -9,7 +9,7 @@
 #define TOKEN_H
 
 #include "./symbol.h"
-#include <string>
+#include "./attribute.h"
 
 using namespace std;
 
@@ -18,18 +18,19 @@ class Token
 public:
   // Constructors
   Token();
-  Token(const Symbol &, const string &);
+  Token(const Symbol &, const Attribute &);
 
   // Public Methods
+  // Getters and Setters
   Symbol getSname();
   void setSname(const Symbol &);
-  string getSval();
-  void setSval(const string &);
+  Attribute getSval();
+  void setSval(const Attribute &);
 
 private:
   // Data Members
   Symbol sname;
-  string sval;
+  Attribute sval;
 };
 
 #endif

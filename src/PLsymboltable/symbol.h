@@ -50,6 +50,12 @@ enum Symbol
   MODULUS_OPERATOR,
   ASSIGNMENT_OPERATOR,
   ARROW_OPERATOR,
-  INVALID
+  // Utility symbols
+  NONAME,       // Empty Token
+  INVALID_ID,   // ID error indicator
+  INVALID_CHAR, // Char error indicator
+  INVALID_NUM,  // Overflow
+  NEWLINE
+
 };
 #endif

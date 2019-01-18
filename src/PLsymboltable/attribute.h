@@ -10,6 +10,7 @@
 #define ATTRIBUTE_H
 
 #include "./token.h"
+#include <string>
 
 using namespace std;
 
@@ -18,11 +19,22 @@ class Attribute
 public:
   // Constructors
   Attribute();
-  Attribute(const Token &);
+  Attribute(const int &, const string &);
+
+  // Public Methods
+  // Getters and Setters
+  int getValue();
+  void setValue(const int &);
+  string getLexeme();
+  void setLexeme(const string &);
 
 private:
   // Data Members
-  Token token;
+  // for NUM, value is the numerical value of the decimal string
+  // for ID/Keywords, value is the location of the token in the Symbol Table
+  int value;
+  // for ID/Keywords, unused otherwise
+  string lexeme;
 };
 
 #endif

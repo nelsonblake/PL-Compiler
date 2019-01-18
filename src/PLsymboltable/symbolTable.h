@@ -9,7 +9,7 @@
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
-#include "./attribute.h"
+#include "./token.h"
 #include "./symbolTableEntry.h"
 
 using namespace std;
@@ -26,8 +26,8 @@ public:
   ~SymbolTable();
 
   // Public Methods
-  Attribute get(const int &);
-  void put(const int &, const Attribute &);
+  Token get(const int &);
+  void put(const int &, const Token &);
 
 private:
   // Data Members

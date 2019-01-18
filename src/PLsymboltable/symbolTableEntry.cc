@@ -11,10 +11,10 @@
 using namespace std;
 
 // Constructors
-SymbolTableEntry::SymbolTableEntry(const int &k, const Attribute &attr)
+SymbolTableEntry::SymbolTableEntry(const int &k, const Token &t)
 {
   key = k;
-  attributes = attr;
+  token = t;
 }
 
 // Getters
@@ -23,7 +23,7 @@ int SymbolTableEntry::getKey()
   return key;
 }
 
-Attribute SymbolTableEntry::getAttributes()
+Token SymbolTableEntry::getToken()
 {
-  return attributes;
+  return token;
 }

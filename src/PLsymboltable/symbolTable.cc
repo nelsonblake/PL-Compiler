@@ -34,7 +34,9 @@ SymbolTable::~SymbolTable()
   delete[] table;
 }
 
-Attribute SymbolTable::get(const int &key)
+// Get Method
+// Given a key, return the token in the hashtable
+Token SymbolTable::get(const int &key)
 {
   int hash = (key % TABLE_SIZE);
   while (table[hash] != NULL && table[hash]->getKey() != key)
@@ -43,15 +45,17 @@ Attribute SymbolTable::get(const int &key)
   }
   if (table[hash] == NULL)
   {
-    return Attribute();
+    return Token();
   }
   else
   {
-    return table[hash]->getAttributes();
+    return table[hash]->getToken();
   }
 }
 
-void SymbolTable::put(const int &key, const Attribute &attr)
+// Put method
+// Insert a Token into the Symbol Table
+void SymbolTable::put(const int &key, const Token &token)
 {
   int hash = (key % TABLE_SIZE);
   while (table[hash] != NULL && table[hash]->getKey() != key)
@@ -62,5 +66,5 @@ void SymbolTable::put(const int &key, const Attribute &attr)
   {
     delete table[hash];
   }
-  table[hash] = new SymbolTableEntry(key, attr);
+  table[hash] = new SymbolTableEntry(key, token);
 }
