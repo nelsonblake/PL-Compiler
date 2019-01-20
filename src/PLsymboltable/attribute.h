@@ -19,6 +19,7 @@ class Attribute
 public:
   // Constructors
   Attribute();
+  Attribute(const string &);
   Attribute(const int &, const string &);
 
   // Public Methods

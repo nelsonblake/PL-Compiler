@@ -7,6 +7,8 @@
 //************************************************************************************
 
 #include "./symbolTable.h"
+#include <string>
+#include <array>
 
 using namespace std;
 
@@ -27,6 +29,36 @@ SymbolTable::~SymbolTable()
 // Fill remaining space with NONAME Empty Token
 void SymbolTable::init()
 {
+  string reservedWords[17] =
+      {
+          "BEGIN",
+          "END",
+          "CONST",
+          "ARRAY",
+          "INTEGER",
+          "BOOLEAN",
+          "PROC",
+          "SKIP",
+          "READ",
+          "WRITE",
+          "CALL",
+          "IF",
+          "FI",
+          "DO",
+          "OD",
+          "FALSE",
+          "TRUE",
+      };
+  for (unsigned int i = 0; i < table.size(); i++)
+  {
+    table[i] = Token();
+  }
+  for (unsigned int i = BEGIN; i < TRUE; i++)
+  {
+    Attribute a = Attribute(-1, reservedWords[i - BEGIN]);
+    Token t = Token(static_cast<Symbol>(i), a);
+    (void)insert(t);
+  }
 }
 
 // search Method
@@ -59,7 +91,16 @@ int SymbolTable::insert(const Token &t)
   }
   if (occupiedCells < TABLE_SIZE)
   {
+    // Insert the token in the Table
     table[location] = temp;
+
+    // If the Attribute's value is -1, we must update it to the index in the Table
+    // If it is not -1, then the Token is a NUM or similar type
+    if (temp.getSval().getValue() == -1)
+    {
+      table[location].setSval(Attribute(location, temp.getSval().getLexeme()));
+    }
+
     occupiedCells++;
   }
   // If the table is full, return -1 for now, possibly implement extendible hashing in future
