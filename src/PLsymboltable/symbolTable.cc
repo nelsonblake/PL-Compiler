@@ -34,20 +34,40 @@ void SymbolTable::init()
 // Or, if not found, return -1
 int SymbolTable::search(const string &lexeme)
 {
+  int index = findIndex(lexeme);
+  if (index != -1)
+  {
+    if (table[index].getSname() != NONAME)
+    {
+      return index;
+    }
+  }
+  return -1;
 }
 
 // insert Method
 // Given a lexeme, create the appropriate Token and insert into Symbol Table
 // If the lexeme already exists, return the position in the table
-int SymbolTable::insert(const string &lexeme)
+int SymbolTable::insert(const Token &t)
 {
-  int location = search(lexeme);
+  Token temp(t);
+  int location = search(temp.getSval().getLexeme());
+
   if (location != -1)
   {
     return location;
   }
-
-  occupiedCells++;
+  if (occupiedCells < TABLE_SIZE)
+  {
+    table[location] = temp;
+    occupiedCells++;
+  }
+  // If the table is full, return -1 for now, possibly implement extendible hashing in future
+  else
+  {
+    return -1;
+  }
+  return location;
 }
 
 // isFull Method
@@ -68,7 +88,7 @@ int SymbolTable::getOccupiedCells()
 int SymbolTable::hash(const string &lexeme)
 {
   int value = 0;
-  for (int i = 0; i < lexeme.length(); i++)
+  for (unsigned int i = 0; i < lexeme.length(); i++)
   {
     value = 37 * value + lexeme[i];
   }
@@ -85,7 +105,7 @@ int SymbolTable::findIndex(const string &lexeme)
   {
     index = (h + offset) % TABLE_SIZE;
 
-    if (table[index].getSname() == NONAME)
+    if (table[index].getSname() == NONAME || table[index].getSval().getLexeme() == lexeme)
     {
       return index;
     }

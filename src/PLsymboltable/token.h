@@ -19,6 +19,7 @@ public:
   // Constructors
   Token();
   Token(const Symbol &, const Attribute &);
+  Token(const Token &);
 
   // Public Methods
   // Getters and Setters

@@ -28,7 +28,7 @@ public:
   // Public Methods
   void init();
   int search(const string &);
-  int insert(const string &);
+  int insert(const Token &);
   bool isFull();
   int getOccupiedCells();
 

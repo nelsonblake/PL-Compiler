@@ -22,6 +22,12 @@ Token::Token(const Symbol &symbol, const Attribute &sv)
   sval = sv;
 }
 
+Token::Token(const Token &t)
+{
+  sname = t.sname;
+  sval = t.sval;
+}
+
 // Getters and Setters
 Symbol Token::getSname()
 {
