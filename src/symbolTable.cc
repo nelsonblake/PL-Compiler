@@ -8,6 +8,7 @@
 
 #include <string>
 #include <array>
+#include <iostream>
 #include "./symbolTable.h"
 
 using namespace std;
@@ -53,7 +54,7 @@ void SymbolTable::init()
   {
     table[i] = Token();
   }
-  for (unsigned int i = BEGIN; i < TRUE; i++)
+  for (unsigned int i = BEGIN; i <= TRUE; i++)
   {
     Attribute a = Attribute(-1, reservedWords[i - BEGIN]);
     Token t = Token(static_cast<Symbol>(i), a);
@@ -91,6 +92,9 @@ int SymbolTable::insert(const Token &t)
   }
   if (occupiedCells < TABLE_SIZE)
   {
+    // Get the new index for our Token
+    location = findIndex(temp.getSval().getLexeme());
+
     // Insert the token in the Table
     table[location] = temp;
 
@@ -156,14 +160,19 @@ int SymbolTable::findIndex(const string &lexeme)
   return -1;
 }
 
-//printTable method
+//printTable Method - for testing
 void SymbolTable::printTable()
 {
-  for (int i = 0; i < TABLE_SIZE - 1; i++)
+  for (int i = 0; i < TABLE_SIZE; i++)
   {
-    cout << "---Symbol Table Index: " << i << "---" << endl
-         << "Symbol: " << table[i].getSname() << endl
-         << "Index: " << table[i].getSval().getValue() << endl
-         << "Lexeme: " << table[i].getSval().getLexeme() << endl;
+    if (table[i].getSval().getValue() != -1)
+    {
+      cout << "---Symbol Table Index: " << i << "---" << endl
+           << "Symbol: " << table[i].getSname() << endl
+           << "Index: " << table[i].getSval().getValue() << endl
+           << "Lexeme: " << table[i].getSval().getLexeme() << endl
+           << endl;
+    }
   }
+  cout << occupiedCells << endl;
 }

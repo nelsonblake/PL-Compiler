@@ -21,5 +21,5 @@ attribute.o : attribute.h
 clean:
 	rm -f *.o *~ *% *# .#*
 
-clean-all:
+clean-all: clean
 	rm -f plc
