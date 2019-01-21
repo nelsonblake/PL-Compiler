@@ -174,5 +174,5 @@ void SymbolTable::printTable()
            << endl;
     }
   }
-  cout << occupiedCells << endl;
+  cout << "Occupied Cells: " << occupiedCells << endl;
 }
