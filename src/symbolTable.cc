@@ -6,9 +6,6 @@
 // Inspired By: https://gist.github.com/ducngtuan/4332979
 //************************************************************************************
 
-#include <string>
-#include <array>
-#include <iostream>
 #include "./symbolTable.h"
 
 using namespace std;

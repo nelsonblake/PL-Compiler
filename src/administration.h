@@ -31,6 +31,9 @@ public:
   // Constructors
   Administration(ifstream &, ofstream &, Scanner &);
 
+  // Destructor
+  ~Administration();
+
   // Public Methods
   void newLine();
   void error(const string &);
@@ -38,8 +41,8 @@ public:
 
 private:
   // Data Members
-  ofstream outputFile;
-  Scanner scanner;
+  ofstream *outputFilePtr;
+  Scanner *scanner;
   int currentLine;
   bool correctLine;
   int errorCount;

@@ -20,16 +20,18 @@ class Scanner
 {
 public:
   // Constructors
-  Scanner();
-  Scanner(ifstream &inputStream, SymbolTable &symbolTable);
+  Scanner(ifstream &, SymbolTable &);
+
+  // Destructor
+  ~Scanner();
 
   // Public Methods
   Token getToken();
 
 private:
   // Data Members
-  ifstream inputFile;
-  SymbolTable symbolTable;
+  ifstream *inputFilePtr;
+  SymbolTable *symbolTablePtr;
   char nextChar;
 
   // Private Methods
