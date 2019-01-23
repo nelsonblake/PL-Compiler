@@ -38,6 +38,8 @@ private:
   // Data Members
   vector<Token> table;
   int occupiedCells;
+
+  // Private Methods
   int hash(const string &);
   int findIndex(const string &);
 };
