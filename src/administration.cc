@@ -12,23 +12,22 @@ Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanne
 {
   scanner = &s;
   outputFilePtr = &outputFile;
-  //open the files
-  inputFile.open("./data.txt");
-  outputFile.open("./output.txt");
   currentLine = 0;
   errorCount = 0;
+  correctLine = true;
 }
 
 // Destructor
 Administration::~Administration()
 {
-  scanner = nullptr;
+  //not sure how to destroy this scanner
+  //scanner = nullptr;
   outputFilePtr = nullptr;
 }
 
 void Administration::newLine()
 {
-  //encounter a line error
+  //encounter a line error -- HOW DO WE KNOW WHEN IT'S WRONG?
   if(correctLine == false)
   {
     //report error
@@ -51,9 +50,5 @@ void Administration::error(const string &s)
 
 int Administration::scan()
 {
-  int indexOfToken = -1;
-  string line;
-  //Giving error on inputFile not being declared, but there is no ifstream data member
-  //getline(inputFile, line, '\n');
-  return indexOfToken;
+
 }

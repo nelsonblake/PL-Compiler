@@ -42,7 +42,7 @@ public:
 private:
   // Data Members
   ofstream *outputFilePtr;
-  Scanner *scanner;
+  Scanner &scanner;
   int currentLine;
   bool correctLine;
   int errorCount;

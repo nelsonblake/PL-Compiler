@@ -11,9 +11,9 @@
 
 int main()
 {
-  SymbolTable s = SymbolTable();
-  s.init();
-  s.printTable();
+  SymbolTable table = SymbolTable();
+  table.init();
+  table.printTable();
 
   return 0;
 }
@@ -42,8 +42,8 @@ int main()
 //   }
 
 //   SymbolTable table;
-//   Scanner s(inputFile, table);
-//   Administration compiler(inputFile, outputFile, s);
+//   Scanner scanner(inputFile, table);
+//   Administration compiler(inputFile, outputFile, scanner);
 //   int status = compiler.scan();
 //   if (status == 0)
 //   {
