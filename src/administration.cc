@@ -8,9 +8,8 @@
 #include "./administration.h"
 
 // Constructors
-Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanner &s)
+Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanner &s) : scanner(s)
 {
-  scanner = &s;
   outputFilePtr = &outputFile;
   currentLine = 0;
   errorCount = 0;
@@ -20,23 +19,18 @@ Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanne
 // Destructor
 Administration::~Administration()
 {
-  //not sure how to destroy this scanner
-  //scanner = nullptr;
   outputFilePtr = nullptr;
 }
 
 void Administration::newLine()
 {
-  //encounter a line error -- HOW DO WE KNOW WHEN IT'S WRONG?
   if(correctLine == false)
   {
-    //report error
-    //error("meaningful error message");
     errorCount++;
     if(errorCount == MAX_ERRORS)
     {
-      cout << "maximum error count exceeded" << endl;
-      exit(0);
+      cerr << "Maximum error count exceeded -- stopping scanner." << endl;
+      exit(-1);
     }
     currentLine++;
   }
@@ -50,5 +44,6 @@ void Administration::error(const string &s)
 
 int Administration::scan()
 {
-
+  scanner.getToken();
+  return 0;
 }

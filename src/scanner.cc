@@ -10,8 +10,10 @@
 // Constructors
 Scanner::Scanner(ifstream &inputFile, SymbolTable &table)
 {
+  SymbolTable t = table;
   inputFilePtr = &inputFile;
   symbolTablePtr = &table;
+  symbolTablePtr->init();
 }
 
 // Assignment Operator
@@ -91,4 +93,12 @@ bool Scanner::isSpecial(const char & c)
     return true;
   }
   return false;
+}
+
+//getToken Method
+Token Scanner::getToken()
+{
+  nextChar = inputFilePtr->get();
+  cout << nextChar << endl;
+  return Token();
 }
