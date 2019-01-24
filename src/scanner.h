@@ -11,6 +11,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cctype>
+#include <algorithm>
 #include "./token.h"
 #include "./symbolTable.h"
 
@@ -21,6 +23,9 @@ class Scanner
 public:
   // Constructors
   Scanner(ifstream &, SymbolTable &);
+
+  // Assignment operator
+  Scanner operator=(const Scanner &);
 
   // Destructor
   ~Scanner();
