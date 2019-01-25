@@ -33,10 +33,16 @@ Scanner::~Scanner()
   symbolTablePtr = nullptr;
 }
 
-// isWhitespace Method
-bool Scanner::isWhitespace(const char & c)
+// getSymbolTablePtr Method
+SymbolTable *Scanner::getSymbolTablePtr()
 {
-  if(isspace(c))
+  return symbolTablePtr;
+}
+
+// isWhitespace Method
+bool Scanner::isWhitespace(const char &c)
+{
+  if (isspace(c))
   {
     return true;
   }
@@ -44,9 +50,9 @@ bool Scanner::isWhitespace(const char & c)
 }
 
 // isAlpha Method
-bool Scanner::isAlpha(const char & c)
+bool Scanner::isAlpha(const char &c)
 {
-  if(isalpha(c))
+  if (isalpha(c))
   {
     return true;
   }
@@ -54,9 +60,9 @@ bool Scanner::isAlpha(const char & c)
 }
 
 // isDigit Method
-bool Scanner::isDigit(const char & c)
+bool Scanner::isDigit(const char &c)
 {
-  if(isdigit(c))
+  if (isdigit(c))
   {
     return true;
   }
@@ -64,31 +70,30 @@ bool Scanner::isDigit(const char & c)
 }
 
 // isSpecial Method
-bool Scanner::isSpecial(const char & c)
+bool Scanner::isSpecial(const char &c)
 {
-  char specials[20] = {
-    '.',
-    ',',
-    ';',
-    '~',
-    '<',
-    '>',
-    '=',
-    '[',
-    ']',
-    '&',
-    '|',
-    '+',
-    '-',
-    '*',
-    '\\',
-    '/',
-    '(',
-    ')',
-    '$',
-    ':',
+  char specials[19] = {
+      '.',
+      ',',
+      ';',
+      '~',
+      '<',
+      '>',
+      '=',
+      '[',
+      ']',
+      '&',
+      '|',
+      '+',
+      '-',
+      '*',
+      '\\',
+      '/',
+      '(',
+      ')',
+      ':',
   };
-  if(find(begin(specials), end(specials), c) != end(specials))
+  if (find(begin(specials), end(specials), c) != end(specials))
   {
     return true;
   }
@@ -99,6 +104,68 @@ bool Scanner::isSpecial(const char & c)
 Token Scanner::getToken()
 {
   nextChar = inputFilePtr->get();
-  cout << nextChar << endl;
+  Token t;
+
+  if (isWhitespace(nextChar))
+  {
+    //
+  }
+
+  else if (isAlpha(nextChar))
+  {
+    t = recognizeId();
+  }
+
+  else if (isDigit(nextChar))
+  {
+    t = recognizeDigit();
+  }
+
+  else if (isSpecial(nextChar))
+  {
+    t = recognizeSpecial();
+  }
+
+  else
+  {
+    t = Token();
+  }
+
+  return t;
+}
+
+// recognizeId Method
+Token Scanner::recognizeId()
+{
+  string lexeme(1, nextChar);
+  do
+  {
+    nextChar = nextChar = inputFilePtr->get();
+    {
+      string nextPart(1, nextChar);
+      lexeme += nextPart;
+    }
+  } while (!isWhitespace(nextChar) && (nextChar == '_' || isAlpha(nextChar) || isDigit(nextChar)));
+
+  cout << lexeme << endl;
+
+  // int index = symbolTablePtr->search(lexeme);
+  // if (index == -1)
+  // {
+  //   Token t = Token(ID, Attribute(lexeme));
+  //   return t;
+  // }
+  return Token();
+}
+
+// recognizeDigit Method
+Token Scanner::recognizeDigit()
+{
+  return Token();
+}
+
+// recognizeSpecial Method
+Token Scanner::recognizeSpecial()
+{
   return Token();
 }

@@ -41,6 +41,7 @@ public:
 
 private:
   // Data Members
+  ifstream *inputFilePtr;
   ofstream *outputFilePtr;
   Scanner &scanner;
   int currentLine;

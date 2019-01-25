@@ -32,6 +32,7 @@ public:
 
   // Public Methods
   Token getToken();
+  SymbolTable *getSymbolTablePtr();
 
 private:
   // Data Members

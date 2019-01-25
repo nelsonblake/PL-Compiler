@@ -10,6 +10,7 @@
 // Constructors
 Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanner &s) : scanner(s)
 {
+  inputFilePtr = &inputFile;
   outputFilePtr = &outputFile;
   currentLine = 0;
   errorCount = 0;
@@ -24,10 +25,10 @@ Administration::~Administration()
 
 void Administration::newLine()
 {
-  if(correctLine == false)
+  if (correctLine == false)
   {
     errorCount++;
-    if(errorCount == MAX_ERRORS)
+    if (errorCount == MAX_ERRORS)
     {
       cerr << "Maximum error count exceeded -- stopping scanner." << endl;
       exit(-1);
@@ -44,6 +45,14 @@ void Administration::error(const string &s)
 
 int Administration::scan()
 {
-  scanner.getToken();
+  while (!inputFilePtr->eof())
+  {
+    Token t = scanner.getToken();
+    if (t.getSname() != NONAME)
+    {
+      (void)scanner.getSymbolTablePtr()->insert(t);
+    }
+  }
+
   return 0;
 }
