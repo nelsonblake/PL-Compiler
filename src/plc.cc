@@ -9,15 +9,6 @@
 #include <fstream>
 #include "./administration.h"
 
-// int main()
-// {
-//   SymbolTable table = SymbolTable();
-//   table.init();
-//   table.printTable();
-//
-//   return 0;
-// }
-
 int main(int argc, char *argv[])
 {
   // If incorrect arguments are specified:
@@ -52,6 +43,7 @@ int main(int argc, char *argv[])
   {
     cerr << "Scanner encountered error(s)" << endl;
   }
+
   // table.printTable();
 
   return 0;

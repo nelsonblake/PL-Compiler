@@ -126,6 +126,11 @@ Token Scanner::getToken()
     t = recognizeSpecial();
   }
 
+  else if (nextChar == '$')
+  {
+    recognizeComment();
+  }
+
   else
   {
     t = Token();
@@ -138,34 +143,165 @@ Token Scanner::getToken()
 Token Scanner::recognizeId()
 {
   string lexeme(1, nextChar);
-  do
+  char temp = inputFilePtr->peek();
+  while (!isWhitespace(temp) && (temp == '_' || isAlpha(temp) || isDigit(temp)))
   {
-    nextChar = nextChar = inputFilePtr->get();
-    {
-      string nextPart(1, nextChar);
-      lexeme += nextPart;
-    }
-  } while (!isWhitespace(nextChar) && (nextChar == '_' || isAlpha(nextChar) || isDigit(nextChar)));
+    string nextPart(1, temp);
+    lexeme += nextPart;
+    nextChar = inputFilePtr->get();
+    temp = inputFilePtr->peek();
+  }
+  string lexemeSigChars = lexeme.substr(0, 10);
 
-  cout << lexeme << endl;
-
-  // int index = symbolTablePtr->search(lexeme);
-  // if (index == -1)
-  // {
-  //   Token t = Token(ID, Attribute(lexeme));
-  //   return t;
-  // }
+  int index = symbolTablePtr->search(lexemeSigChars);
+  if (index == -1)
+  {
+    Token t = Token(ID, Attribute(lexemeSigChars));
+    // cout << "IDENTIFIER: " << lexemeSigChars << endl;
+    return t;
+  }
   return Token();
 }
 
 // recognizeDigit Method
 Token Scanner::recognizeDigit()
 {
-  return Token();
+  string digitString(1, nextChar);
+  char temp = inputFilePtr->peek();
+  while (isDigit(temp))
+  {
+    string nextPart(1, temp);
+    digitString += nextPart;
+    nextChar = inputFilePtr->get();
+    temp = inputFilePtr->peek();
+  }
+
+  int digit = stoi(digitString);
+  Token t = Token(NUM, Attribute(digit));
+  // cout << "DIGIT: " << digit << endl;
+  return t;
 }
 
 // recognizeSpecial Method
 Token Scanner::recognizeSpecial()
 {
-  return Token();
+  char special = nextChar;
+  if (special == ':')
+  {
+    char temp = inputFilePtr->peek();
+    if (temp == '=')
+    {
+      nextChar = inputFilePtr->get();
+      Token t = Token(ASSIGNMENT_OPERATOR, Attribute());
+      // cout << "SPECIAL: " << special << temp << endl;
+      return t;
+    }
+    // Throw error
+  }
+  if (special == '[')
+  {
+    char temp = inputFilePtr->peek();
+    if (temp == ']')
+    {
+      nextChar = inputFilePtr->get();
+      Token t = Token(GUARDED_COMMAND, Attribute());
+      // cout << "SPECIAL: " << special << temp << endl;
+      return t;
+    }
+  }
+  if (special == '-')
+  {
+    char temp = inputFilePtr->peek();
+    if (temp == '>')
+    {
+      nextChar = inputFilePtr->get();
+      Token t = Token(ARROW, Attribute());
+      // cout << "SPECIAL: " << special << temp << endl;
+      return t;
+    }
+  }
+  Symbol s;
+  if (special == '.')
+  {
+    s = PERIOD;
+  }
+  else if (special == ',')
+  {
+    s = COMMA;
+  }
+  else if (special == ';')
+  {
+    s = SEMICOLON;
+  }
+  else if (special == '~')
+  {
+    s = NOT_OPERATOR;
+  }
+  else if (special == '<')
+  {
+    s = LESS_THAN_OPERATOR;
+  }
+  else if (special == '>')
+  {
+    s = GREATER_THAN_OPERATOR;
+  }
+  else if (special == '=')
+  {
+    s = EQUAL_OPERATOR;
+  }
+  else if (special == '[')
+  {
+    s = OPEN_SQUARE_BRACKET;
+  }
+  else if (special == ']')
+  {
+    s = CLOSE_SQUARE_BRACKET;
+  }
+  else if (special == '&')
+  {
+    s = AND_OPERATOR;
+  }
+  else if (special == '|')
+  {
+    s = OR_OPERATOR;
+  }
+  else if (special == '+')
+  {
+    s = ADDITION_OPERATOR;
+  }
+  else if (special == '-')
+  {
+    s = SUBTRACTION_OPERATOR;
+  }
+  else if (special == '*')
+  {
+    s = MULTIPLICATION_OPERATOR;
+  }
+  else if (special == '\\')
+  {
+    s = MODULUS_OPERATOR;
+  }
+  else if (special == '/')
+  {
+    s = DIVISION_OPERATOR;
+  }
+  else if (special == '(')
+  {
+    s = OPEN_PARENTHESIS;
+  }
+  else if (special == ')')
+  {
+    s = CLOSE_PARENTHESIS;
+  }
+
+  // cout << "SPECIAL: " << special << endl;
+  Token t = Token(s, Attribute());
+  return t;
+}
+
+void Scanner::recognizeComment()
+{
+  char comment[1028];
+  inputFilePtr->getline(comment, 1028);
+  // cout << "COMMENT: " << comment << endl;
 }

@@ -48,7 +48,7 @@ int Administration::scan()
   while (!inputFilePtr->eof())
   {
     Token t = scanner.getToken();
-    if (t.getSname() != NONAME)
+    if (t.getSname() == ID)
     {
       (void)scanner.getSymbolTablePtr()->insert(t);
     }

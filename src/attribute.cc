@@ -16,11 +16,19 @@ Attribute::Attribute()
   value = -1;
   lexeme = "";
 }
+
 Attribute::Attribute(const string &l)
 {
   value = -1;
   lexeme = l;
 }
+
+Attribute::Attribute(const int &v)
+{
+  value = v;
+  lexeme = "";
+}
+
 Attribute::Attribute(const int &v, const string &l = "")
 {
   value = v;
