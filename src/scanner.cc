@@ -103,40 +103,49 @@ bool Scanner::isSpecial(const char &c)
 //getToken Method
 Token Scanner::getToken()
 {
-  nextChar = inputFilePtr->get();
-  Token t;
-
-  if (isWhitespace(nextChar))
+  int eofCheck = inputFilePtr->peek();
+  if (eofCheck != EOF)
   {
-    //
-  }
+    nextChar = inputFilePtr->get();
+    Token t;
 
-  else if (isAlpha(nextChar))
-  {
-    t = recognizeId();
-  }
+    if (isWhitespace(nextChar))
+    {
+      // Not Windows compatible!
+      if (nextChar == '\n')
+      {
+        t = Token(NEWLINE, Attribute());
+      }
+    }
 
-  else if (isDigit(nextChar))
-  {
-    t = recognizeDigit();
-  }
+    else if (isAlpha(nextChar))
+    {
+      t = recognizeId();
+    }
 
-  else if (isSpecial(nextChar))
-  {
-    t = recognizeSpecial();
-  }
+    else if (isDigit(nextChar))
+    {
+      t = recognizeDigit();
+    }
 
-  else if (nextChar == '$')
-  {
-    recognizeComment();
-  }
+    else if (isSpecial(nextChar))
+    {
+      t = recognizeSpecial();
+    }
 
-  else
-  {
-    t = Token();
-  }
+    else if (nextChar == '$')
+    {
+      t = recognizeComment();
+    }
 
-  return t;
+    else
+    {
+      t = Token(INVALID_CHAR, Attribute(string(1, nextChar)));
+    }
+
+    return t;
+  }
+  return Token();
 }
 
 // recognizeId Method
@@ -144,6 +153,7 @@ Token Scanner::recognizeId()
 {
   string lexeme(1, nextChar);
   char temp = inputFilePtr->peek();
+  Token t;
   while (!isWhitespace(temp) && (temp == '_' || isAlpha(temp) || isDigit(temp)))
   {
     string nextPart(1, temp);
@@ -151,12 +161,13 @@ Token Scanner::recognizeId()
     nextChar = inputFilePtr->get();
     temp = inputFilePtr->peek();
   }
+
   string lexemeSigChars = lexeme.substr(0, 10);
 
   int index = symbolTablePtr->search(lexemeSigChars);
   if (index == -1)
   {
-    Token t = Token(ID, Attribute(lexemeSigChars));
+    t = Token(ID, Attribute(lexemeSigChars));
     // cout << "IDENTIFIER: " << lexemeSigChars << endl;
     return t;
   }
@@ -167,6 +178,7 @@ Token Scanner::recognizeId()
 Token Scanner::recognizeDigit()
 {
   string digitString(1, nextChar);
+  Token t;
   char temp = inputFilePtr->peek();
   while (isDigit(temp))
   {
@@ -174,10 +186,29 @@ Token Scanner::recognizeDigit()
     digitString += nextPart;
     nextChar = inputFilePtr->get();
     temp = inputFilePtr->peek();
+    if (isAlpha(temp))
+    {
+      break;
+    }
+  }
+
+  if (isAlpha(temp))
+  {
+    string finalChar(1, temp);
+    t = Token(INVALID_ID, Attribute(digitString + finalChar));
+    return t;
   }
 
   int digit = stoi(digitString);
-  Token t = Token(NUM, Attribute(digit));
+
+  // Max integer size set to 2^16 - can be adjusted later
+  if (digit > 65536)
+  {
+    t = Token(INVALID_NUM, Attribute(digitString));
+    return t;
+  }
+
+  t = Token(NUM, Attribute(digit));
   // cout << "DIGIT: " << digit << endl;
   return t;
 }
@@ -186,17 +217,19 @@ Token Scanner::recognizeDigit()
 Token Scanner::recognizeSpecial()
 {
   char special = nextChar;
+  Token t;
   if (special == ':')
   {
     char temp = inputFilePtr->peek();
     if (temp == '=')
     {
       nextChar = inputFilePtr->get();
-      Token t = Token(ASSIGNMENT_OPERATOR, Attribute());
+      t = Token(ASSIGNMENT_OPERATOR, Attribute());
       // cout << "SPECIAL: " << special << temp << endl;
       return t;
     }
-    // Throw error
+    t = Token(INVALID_CHAR, Attribute(":"));
+    return t;
   }
   if (special == '[')
   {
@@ -204,7 +237,7 @@ Token Scanner::recognizeSpecial()
     if (temp == ']')
     {
       nextChar = inputFilePtr->get();
-      Token t = Token(GUARDED_COMMAND, Attribute());
+      t = Token(GUARDED_COMMAND, Attribute());
       // cout << "SPECIAL: " << special << temp << endl;
       return t;
     }
@@ -215,7 +248,7 @@ Token Scanner::recognizeSpecial()
     if (temp == '>')
     {
       nextChar = inputFilePtr->get();
-      Token t = Token(ARROW, Attribute());
+      t = Token(ARROW, Attribute());
       // cout << "SPECIAL: " << special << temp << endl;
       return t;
     }
@@ -295,13 +328,17 @@ Token Scanner::recognizeSpecial()
   }
 
   // cout << "SPECIAL: " << special << endl;
-  Token t = Token(s, Attribute());
+  t = Token(s, Attribute());
   return t;
 }
 
-void Scanner::recognizeComment()
+Token Scanner::recognizeComment()
 {
   char comment[1028];
   inputFilePtr->getline(comment, 1028);
   // cout << "COMMENT: " << comment << endl;
+
+  // Return a NEWLINE token to make sure the line count stays correct
+  Token t = Token(NEWLINE, Attribute());
+  return t;
 }

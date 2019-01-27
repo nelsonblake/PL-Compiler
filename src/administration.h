@@ -35,8 +35,7 @@ public:
   ~Administration();
 
   // Public Methods
-  void newLine();
-  void error(const string &);
+  void error(const string &, const Token &);
   int scan();
 
 private:

@@ -48,7 +48,7 @@ private:
   Token recognizeId();
   Token recognizeSpecial();
   Token recognizeDigit();
-  void recognizeComment();
+  Token recognizeComment();
 };
 
 #endif

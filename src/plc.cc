@@ -44,7 +44,5 @@ int main(int argc, char *argv[])
     cerr << "Scanner encountered error(s)" << endl;
   }
 
-  // table.printTable();
-
   return 0;
 }

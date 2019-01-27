@@ -12,7 +12,7 @@ Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanne
 {
   inputFilePtr = &inputFile;
   outputFilePtr = &outputFile;
-  currentLine = 0;
+  currentLine = 1;
   errorCount = 0;
   correctLine = true;
 }
@@ -23,36 +23,48 @@ Administration::~Administration()
   outputFilePtr = nullptr;
 }
 
-void Administration::newLine()
+void Administration::error(const string &s, const Token &t)
 {
-  if (correctLine == false)
-  {
-    errorCount++;
-    if (errorCount == MAX_ERRORS)
-    {
-      cerr << "Maximum error count exceeded -- stopping scanner." << endl;
-      exit(-1);
-    }
-    currentLine++;
-  }
-  correctLine = true;
-}
+  string errorType(s);
+  Token temp(t);
+  cout << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl;
 
-void Administration::error(const string &s)
-{
-  cout << currentLine << " " << s << endl;
+  // Ignore the rest of the line
+  inputFilePtr->ignore(256, '\n');
+  currentLine++;
+  errorCount++;
 }
 
 int Administration::scan()
 {
-  while (!inputFilePtr->eof())
+  while (!inputFilePtr->eof() && errorCount < MAX_ERRORS)
   {
     Token t = scanner.getToken();
     if (t.getSname() == ID)
     {
       (void)scanner.getSymbolTablePtr()->insert(t);
     }
+    else if (t.getSname() == NEWLINE)
+    {
+      currentLine++;
+    }
+    else if (t.getSname() == INVALID_CHAR)
+    {
+      error("Invalid character", t);
+    }
+    else if (t.getSname() == INVALID_ID)
+    {
+      error("Invalid identifier", t);
+    }
+    else if (t.getSname() == INVALID_NUM)
+    {
+      error("Invalid number", t);
+    }
   }
-
+  if (errorCount == MAX_ERRORS)
+  {
+    cout << "Maximum error count reached (" << MAX_ERRORS << ") - Scanner is stopping." << endl;
+    return 1;
+  }
   return 0;
 }
