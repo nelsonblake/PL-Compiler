@@ -35,23 +35,13 @@ Attribute::Attribute(const int &v, const string &l = "")
   lexeme = l;
 }
 
-// Getters and Setters
+// Getters
 int Attribute::getValue()
 {
   return value;
 }
 
-void Attribute::setValue(const int &v)
-{
-  value = v;
-}
-
 string Attribute::getLexeme()
 {
   return lexeme;
-}
-
-void Attribute::setLexeme(const string &l)
-{
-  lexeme = l;
 }

@@ -23,11 +23,9 @@ public:
   Attribute(const int &, const string &);
 
   // Public Methods
-  // Getters and Setters
+  // Getters
   int getValue();
-  void setValue(const int &);
   string getLexeme();
-  void setLexeme(const string &);
 
 private:
   // Data Members
