@@ -32,6 +32,7 @@ public:
   int insert(const Token &);
   bool isFull();
   int getOccupiedCells();
+  Token findToken(const int &);
   void printTable();
 
 private:

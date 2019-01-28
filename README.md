@@ -13,4 +13,7 @@ Time Tracking:
 23/1/19 3.5 hours
 25/1/19 1.5 hours
 26/1/19 6 hours
+27/1/19 2 hours
 ```
+
+Total Time: 31 hours

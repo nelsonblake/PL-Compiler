@@ -42,7 +42,65 @@ int Administration::scan()
     Token t = scanner.getToken();
     if (t.getSname() == ID)
     {
-      (void)scanner.getSymbolTablePtr()->insert(t);
+      int idIndex = scanner.getSymbolTablePtr()->insert(t);
+      (*outputFilePtr) << "TOKEN TYPE: ID  - "
+                       << "TOKEN ATTRIBUTES - "
+                       << "INDEX: " << setw(5);
+      (*outputFilePtr) << idIndex << setw(10);
+      (*outputFilePtr) << " - LEXEME: " << t.getSval().getLexeme() << endl;
+    }
+    else if (t.getSname() == NUM)
+    {
+      (*outputFilePtr) << "TOKEN TYPE: NUM - "
+                       << "TOKEN ATTRIBUTES - "
+                       << "VALUE: " << setw(5);
+      (*outputFilePtr) << t.getSval().getValue() << endl;
+    }
+    else if (
+        t.getSname() == AND_OPERATOR ||
+        t.getSname() == OR_OPERATOR ||
+        t.getSname() == NOT_OPERATOR ||
+        t.getSname() == LESS_THAN_OPERATOR ||
+        t.getSname() == GREATER_THAN_OPERATOR ||
+        t.getSname() == EQUAL_OPERATOR ||
+        t.getSname() == ADDITION_OPERATOR ||
+        t.getSname() == SUBTRACTION_OPERATOR ||
+        t.getSname() == MULTIPLICATION_OPERATOR ||
+        t.getSname() == DIVISION_OPERATOR ||
+        t.getSname() == MODULUS_OPERATOR ||
+        t.getSname() == ASSIGNMENT_OPERATOR ||
+        t.getSname() == ARROW ||
+        t.getSname() == PERIOD ||
+        t.getSname() == COMMA ||
+        t.getSname() == SEMICOLON ||
+        t.getSname() == OPEN_SQUARE_BRACKET ||
+        t.getSname() == CLOSE_SQUARE_BRACKET ||
+        t.getSname() == OPEN_PARENTHESIS ||
+        t.getSname() == CLOSE_PARENTHESIS ||
+        t.getSname() == GUARDED_COMMAND)
+    {
+      (*outputFilePtr) << "TOKEN TYPE: OPERATOR " << t.getSval().getLexeme() << endl;
+    }
+    else if (
+        t.getSname() == BEGIN ||
+        t.getSname() == END ||
+        t.getSname() == CONST ||
+        t.getSname() == ARRAY ||
+        t.getSname() == INTEGER ||
+        t.getSname() == BOOLEAN ||
+        t.getSname() == PROC ||
+        t.getSname() == SKIP ||
+        t.getSname() == READ ||
+        t.getSname() == WRITE ||
+        t.getSname() == CALL ||
+        t.getSname() == IF ||
+        t.getSname() == FI ||
+        t.getSname() == DO ||
+        t.getSname() == OD ||
+        t.getSname() == FALSE ||
+        t.getSname() == TRUE)
+    {
+      (*outputFilePtr) << "TOKEN TYPE: RESERVED WORD " << t.getSval().getLexeme() << endl;
     }
     else if (t.getSname() == NEWLINE)
     {
@@ -64,6 +122,10 @@ int Administration::scan()
   if (errorCount == MAX_ERRORS)
   {
     cout << "Maximum error count reached (" << MAX_ERRORS << ") - Scanner is stopping." << endl;
+    return 1;
+  }
+  if (errorCount > 0)
+  {
     return 1;
   }
   return 0;

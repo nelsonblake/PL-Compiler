@@ -1,0 +1,62 @@
+$ This and all other comments should be ignored
+
+$ Reserved words should be designated as such in the output
+begin
+end
+const
+array
+integer
+Boolean
+proc
+skip
+read
+write
+call
+if
+fi
+do
+od
+false
+true
+
+$ *** Identifier tests ***
+
+$ Should be valid ID
+ident_1234
+
+$ Should only store first 10 characters in output (expected output abcdefghij)
+abcdefghijk
+
+$ Should throw invalid ID error
+1aa
+
+$ *** Number tests ***
+
+$ Should be valid number
+12345
+
+$ Should throw invalid number error
+65537
+
+$ *** Operator tests ***
+
+$ Should return correct operators
+. , ; [ ] & | ~ < = > + - * / \ ( ) := [] ->
+
+$ Should throw invalid character error (line location should be 44, 45, 46 for these)
+:
+@
+%
+
+$ Should cause scanner to bail out after reaching max error count
+^
+!
+#
+"
+'
+
+
+
+
+
+

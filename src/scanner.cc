@@ -171,6 +171,11 @@ Token Scanner::recognizeId()
     // cout << "IDENTIFIER: " << lexemeSigChars << endl;
     return t;
   }
+  else
+  {
+    t = symbolTablePtr->findToken(index);
+    return t;
+  }
   return Token();
 }
 
@@ -224,7 +229,7 @@ Token Scanner::recognizeSpecial()
     if (temp == '=')
     {
       nextChar = inputFilePtr->get();
-      t = Token(ASSIGNMENT_OPERATOR, Attribute());
+      t = Token(ASSIGNMENT_OPERATOR, Attribute(string(1, special) + string(1, temp)));
       // cout << "SPECIAL: " << special << temp << endl;
       return t;
     }
@@ -237,7 +242,7 @@ Token Scanner::recognizeSpecial()
     if (temp == ']')
     {
       nextChar = inputFilePtr->get();
-      t = Token(GUARDED_COMMAND, Attribute());
+      t = Token(GUARDED_COMMAND, Attribute(string(1, special) + string(1, temp)));
       // cout << "SPECIAL: " << special << temp << endl;
       return t;
     }
@@ -248,7 +253,7 @@ Token Scanner::recognizeSpecial()
     if (temp == '>')
     {
       nextChar = inputFilePtr->get();
-      t = Token(ARROW, Attribute());
+      t = Token(ARROW, Attribute(string(1, special) + string(1, temp)));
       // cout << "SPECIAL: " << special << temp << endl;
       return t;
     }
@@ -328,14 +333,14 @@ Token Scanner::recognizeSpecial()
   }
 
   // cout << "SPECIAL: " << special << endl;
-  t = Token(s, Attribute());
+  t = Token(s, Attribute(string(1, special)));
   return t;
 }
 
 Token Scanner::recognizeComment()
 {
-  char comment[1028];
-  inputFilePtr->getline(comment, 1028);
+  char comment[1024];
+  inputFilePtr->getline(comment, 1024);
   // cout << "COMMENT: " << comment << endl;
 
   // Return a NEWLINE token to make sure the line count stays correct

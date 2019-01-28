@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
   ifstream inputFile(argv[1]);
   if (!inputFile)
   {
-    cerr << "Input file " << argv[2] << " could not be opened." << endl;
+    cerr << "Input file " << argv[1] << " could not be opened." << endl;
     return 1;
   }
 

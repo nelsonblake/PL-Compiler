@@ -112,6 +112,12 @@ int SymbolTable::insert(const Token &t)
   return location;
 }
 
+// Retrieve a token from the symbol table, given an index
+Token SymbolTable::findToken(const int &i)
+{
+  return table[i];
+}
+
 // isFull Method
 // return true if Symbol Table is full, else false
 bool SymbolTable::isFull()
