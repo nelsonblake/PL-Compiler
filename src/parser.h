@@ -18,20 +18,22 @@ class Parser
 {
 public:
   // Constructors
-  Parser();
+  Parser(Administration &);
 
   // Public Methods
-  void match(const Symbol &, const vector<Symbol> &);
-  void syntaxError(const vector<Symbol> &);
-  void syntaxCheck(const vector<Symbol> &);
+  int parse();
 
 private:
   // Private Methods
   bool member(const Symbol &, const vector<Symbol> &);
+  void match(const Symbol &, const vector<Symbol> &);
+  void syntaxError(const vector<Symbol> &);
+  void syntaxCheck(const vector<Symbol> &);
+  void handleScanError(Token &);
 
   // Data Members
-  Token lookAhead;
+  Token laToken;
   Administration &admin;
 };
 
-#endif;
+#endif

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include "./administration.h"
+#include "./parser.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,16 +33,18 @@ int main(int argc, char *argv[])
     return 1;
   }
   SymbolTable table;
+
   Scanner scanner(inputFile, table);
-  Administration compiler(inputFile, outputFile, scanner);
-  int status = compiler.scan();
+  Administration administration(inputFile, outputFile, scanner);
+  Parser parser(administration);
+  int status = parser.parse();
   if (status == 0)
   {
-    cout << "Scanning completed successfully." << endl;
+    cout << "Parsing completed successfully." << endl;
   }
   else
   {
-    cerr << "Scanner encountered error(s)" << endl;
+    cerr << "Compiler encountered error(s)" << endl;
   }
 
   return 0;

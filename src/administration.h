@@ -36,8 +36,12 @@ public:
   ~Administration();
 
   // Public Methods
+  Scanner getScanner();
+  ifstream *getInputFilePtr();
+  int getCurrentLine();
+  int getErrorCount();
+  void incrementCurrentLine();
   void error(const ErrorTypes &, const string &, const Token &);
-  int scan();
 
 private:
   // Data Members
