@@ -2,7 +2,7 @@
 
 Compiler design project for PL language (CPSC 4600)
 
-Time Tracking:
+Time Tracking (Scanner):
 
 ```
 15/1/19 4 hours
@@ -17,3 +17,10 @@ Time Tracking:
 ```
 
 Total Time: 31 hours
+
+Time Tracking (Parser):
+
+```
+18/2/19 4 hours
+19/2/19
+```

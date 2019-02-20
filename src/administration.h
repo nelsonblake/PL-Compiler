@@ -1,6 +1,6 @@
 //************************************************************************************
 // CPSC 4600
-// PL Language Scanner
+// PL Language Compiler
 // Administration Interface File
 // Written By: Eric Den Haan and Blake Nelson
 //************************************************************************************
@@ -36,7 +36,7 @@ public:
   ~Administration();
 
   // Public Methods
-  void error(const string &, const Token &);
+  void error(const ErrorTypes &, const string &, const Token &);
   int scan();
 
 private:
@@ -45,7 +45,6 @@ private:
   ofstream *outputFilePtr;
   Scanner &scanner;
   int currentLine;
-  bool correctLine;
   int errorCount;
 };
 

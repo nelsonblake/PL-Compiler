@@ -1,6 +1,6 @@
 //************************************************************************************
 // CPSC 4600
-// PL Language Scanner
+// PL Language Compiler
 // Token Implementation File
 // Written By: Eric Den Haan and Blake Nelson
 //************************************************************************************
