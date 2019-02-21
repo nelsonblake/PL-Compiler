@@ -8,7 +8,7 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-enum Symbol
+enum Symbol : int
 {
   // Identifier and Number
   ID = 256,

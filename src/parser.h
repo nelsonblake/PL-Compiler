@@ -14,6 +14,8 @@
 
 using namespace std;
 
+typedef vector<Symbol> StopSet;
+
 class Parser
 {
 public:
@@ -25,11 +27,15 @@ public:
 
 private:
   // Private Methods
-  bool member(const Symbol &, const vector<Symbol> &);
-  void match(const Symbol &, const vector<Symbol> &);
-  void syntaxError(const vector<Symbol> &);
-  void syntaxCheck(const vector<Symbol> &);
+  bool member(const Symbol &, const StopSet &);
+  void match(const Symbol &, const StopSet &);
+  void syntaxError(const StopSet &);
+  void syntaxCheck(const StopSet &);
   void handleScanError(Token &);
+
+  // Non-Terminal Parsing Functions
+  void program(const StopSet &);
+  void block(const StopSet &);
 
   // Data Members
   Token laToken;

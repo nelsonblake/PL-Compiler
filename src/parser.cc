@@ -16,19 +16,9 @@ Parser::Parser(Administration &a) : admin(a)
 // Public Methods
 int Parser::parse()
 {
-  while (!admin.getInputFilePtr()->eof() && admin.getErrorCount() < MAX_ERRORS)
-  {
-    laToken = admin.getScanner().getToken();
-    if (laToken.getSname() == INVALID_CHAR || laToken.getSname() == INVALID_ID || laToken.getSname() == INVALID_NUM)
-    {
-      handleScanError(laToken);
-    }
-    if (admin.getErrorCount() == MAX_ERRORS)
-    {
-      cout << "Maximum error count reached (" << MAX_ERRORS << ") - Compiler is stopping." << endl;
-      return 1;
-    }
-  }
+  StopSet initialSts;
+  program(initialSts);
+
   if (admin.getErrorCount() > 0)
   {
     return 1;
@@ -37,6 +27,20 @@ int Parser::parse()
 }
 
 // Private Methods
+void Parser::match(const Symbol &s, const StopSet &sts)
+{
+  Symbol laSymbol = laToken.getSname();
+  if (laSymbol == s)
+  {
+    laToken = admin.getScanner().getToken();
+    handleScanError(laToken);
+  }
+  else
+  {
+    cout << "Error" << endl;
+  }
+}
+
 void Parser::handleScanError(Token &t)
 {
   if (t.getSname() == INVALID_CHAR)
@@ -51,4 +55,26 @@ void Parser::handleScanError(Token &t)
   {
     admin.error(ErrorTypes::ScanError, "Invalid number", t);
   }
+}
+
+StopSet stsUnion(const StopSet &sts, const Symbol &s)
+{
+  StopSet newSts = sts;
+  newSts.push_back(s);
+  return newSts;
+}
+
+// Non-Terminal Parsing Functions
+void Parser::program(const StopSet &sts)
+{
+  block(stsUnion(sts, Symbol::PERIOD));
+  match(Symbol::PERIOD, sts);
+}
+
+void Parser::block(const StopSet &sts)
+{
+  match(Symbol::BEGIN, sts);
+  //DefinitionPart
+  //StatementPart
+  match(Symbol::END, sts);
 }

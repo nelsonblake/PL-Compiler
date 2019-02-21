@@ -22,5 +22,6 @@ Time Tracking (Parser):
 
 ```
 18/2/19 4 hours
-19/2/19
+19/2/19 4 hours
+20/2/19
 ```
