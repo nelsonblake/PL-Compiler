@@ -10,7 +10,7 @@
 // Constructors
 Parser::Parser(Administration &a) : admin(a)
 {
-  laToken = admin.getScanner().getToken();
+  laToken = getValidToken();
 }
 
 // Public Methods
@@ -43,9 +43,19 @@ void Parser::handleScanError(Token &t)
   }
 }
 
+Token Parser::getValidToken()
+{
+  Token t = admin.getScanner().getToken();
+  while (t.getSname() == Symbol::NEWLINE || t.getSname() == Symbol::NONAME)
+  {
+    t = admin.getScanner().getToken();
+  }
+  return t;
+}
+
 void Parser::syntaxError(const StopSet &sts)
 {
-  cout << "Error" << endl;
+  cout << "Error: " << laToken.getSname() << endl;
   exit(1);
 }
 
@@ -92,10 +102,11 @@ void Parser::printNT(const string &s)
 
 void Parser::match(const Symbol &s, const StopSet &sts)
 {
+  cout << "Terminal: " << laToken.getSval().getLexeme() << " " << laToken.getSval().getValue() << endl;
   Symbol laSymbol = laToken.getSname();
   if (laSymbol == s)
   {
-    laToken = admin.getScanner().getToken();
+    laToken = getValidToken();
     handleScanError(laToken);
   }
   else
@@ -129,9 +140,10 @@ void Parser::definitionPart(const StopSet &sts)
   syntaxCheck(newSts);
   while (member(laToken.getSname(), firstDefinition))
   {
-    definitionPart(newSts);
+    definition(newSts);
   }
 }
+
 void Parser::definition(const StopSet &sts)
 {
   printNT("Definition");
@@ -163,9 +175,15 @@ void Parser::definition(const StopSet &sts)
 }
 void Parser::constantDefinition(const StopSet &sts)
 {
+  printNT("Constant Definition");
+  match(Symbol::CONST, stsUnion(stsUnion(stsUnion(sts, stsTerminal(Symbol::ID)), stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
+  match(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
+  match(Symbol::EQUAL_OPERATOR, stsUnion(sts, firstConstant));
+  constant(sts);
 }
 void Parser::variableDefinition(const StopSet &sts)
 {
+  printNT("Variable Definition");
 }
 void Parser::typeSymbol(const StopSet &sts)
 {
@@ -175,6 +193,7 @@ void Parser::variableList(const StopSet &sts)
 }
 void Parser::procedureDefinition(const StopSet &sts)
 {
+  printNT("Procedure Definition");
 }
 void Parser::statementPart(const StopSet &sts)
 {
@@ -250,6 +269,7 @@ void Parser::indexedSelector(const StopSet &sts)
 }
 void Parser::constant(const StopSet &sts)
 {
+  printNT("Constant");
 }
 void Parser::booleanSymbol(const StopSet &sts)
 {
