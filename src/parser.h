@@ -38,6 +38,7 @@ private:
   StopSet stsUnion(const StopSet &, const StopSet &);
   StopSet stsTerminal(const Symbol &);
   void printNT(const string &);
+  void printSts(const StopSet &);
 
   // Non-Terminal Parsing Functions
   void program(const StopSet &);
@@ -46,6 +47,7 @@ private:
   void definition(const StopSet &);
   void constantDefinition(const StopSet &);
   void variableDefinition(const StopSet &);
+  void arrayOrVariableListDefinition(const StopSet &);
   void typeSymbol(const StopSet &);
   void variableList(const StopSet &);
   void procedureDefinition(const StopSet &);
