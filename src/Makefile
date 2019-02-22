@@ -6,7 +6,7 @@ CCCFLAGS = -Wall -g -std=c++11 -lpthread
 
 all : plc
 
-plc : plc.o administration.o scanner.o parser.o symbolTable.o token.o attribute.o
+plc : plc.o administration.o scanner.o parser.o firstSets.o symbolTable.o token.o attribute.o
 	$(CCC) $(CCCFLAGS) -o $@ $^
 
 %.o : %.cc
@@ -16,7 +16,9 @@ administration.o : administration.h scanner.h
 
 scanner.o : scanner.h symbolTable.h token.h
 
-parser.o : administration.h token.h
+parser.o : administration.h token.h firstSets.cc
+
+firstSets.o : token.h
 
 symbolTable.o	:	symbolTable.h token.h
 

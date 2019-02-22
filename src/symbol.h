@@ -60,6 +60,7 @@ enum Symbol : int
   INVALID_ID,   // ID error indicator
   INVALID_CHAR, // Char error indicator
   INVALID_NUM,  // Overflow
-  NEWLINE
+  NEWLINE,
+  EPSILON
 };
 #endif

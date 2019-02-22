@@ -1,0 +1,44 @@
+$Scanner test for PL
+
+$abcdefghijklmnopqrstuvwxyz
+$ABCDEFGHIJKLMNOPQRSTUVWXYZ
+$1234567890!@#$%^&*()_+-=[{]}\|;:'",<.>/?`~
+
+& | ~
+
+< = > + - * / \ 
+
+. ; [ ] , := -> ( ) [] $ 
+
+0 32767
+
+false true begin end const array integer Boolean proc skip read write call if fi do od 
+
+abcdefghijklmnopqrstuvwxyz0123456789
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+
+array Hello
+
+$Scanner test for PL
+
+$abcdefghijklmnopqrstuvwxyz
+$ABCDEFGHIJKLMNOPQRSTUVWXYZ
+$1234567890!@#$%^&*()_+-=[{]}\|;:'",<.>/?`~
+
+& | ~
+
+< = > + - * / \ 
+
+. ; [ ] , := -> ( ) [] $ 
+
+0 32767
+
+false true begin end const array integer Boolean proc skip read write call if fi do od 
+
+abcdefghijklmnopqrstuvwxyz0123456789
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+
+array Hello
+
