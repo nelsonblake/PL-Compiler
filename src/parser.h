@@ -36,6 +36,7 @@ private:
   void handleScanError(Token &);
   StopSet stsUnion(const StopSet &, const StopSet &);
   StopSet stsTerminal(const Symbol &);
+  void printNT(const string &);
 
   // Non-Terminal Parsing Functions
   void program(const StopSet &);

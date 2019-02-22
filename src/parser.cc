@@ -27,21 +27,6 @@ int Parser::parse()
 }
 
 // Private Methods
-void Parser::match(const Symbol &s, const StopSet &sts)
-{
-  Symbol laSymbol = laToken.getSname();
-  if (laSymbol == s)
-  {
-    laToken = admin.getScanner().getToken();
-    handleScanError(laToken);
-  }
-  else
-  {
-    syntaxError(sts);
-  }
-  syntaxCheck(sts);
-}
-
 void Parser::handleScanError(Token &t)
 {
   if (t.getSname() == INVALID_CHAR)
@@ -60,6 +45,7 @@ void Parser::handleScanError(Token &t)
 
 void Parser::syntaxError(const StopSet &sts)
 {
+  cout << "Error" << endl;
   exit(1);
 }
 
@@ -99,15 +85,37 @@ StopSet Parser::stsTerminal(const Symbol &s)
   return newSts;
 }
 
+void Parser::printNT(const string &s)
+{
+  cout << "Parsing: " << s << endl;
+}
+
+void Parser::match(const Symbol &s, const StopSet &sts)
+{
+  Symbol laSymbol = laToken.getSname();
+  if (laSymbol == s)
+  {
+    laToken = admin.getScanner().getToken();
+    handleScanError(laToken);
+  }
+  else
+  {
+    syntaxError(sts);
+  }
+  syntaxCheck(sts);
+}
+
 // Non-Terminal Parsing Functions
 void Parser::program(const StopSet &sts)
 {
+  printNT("Program");
   block(sts);
   match(Symbol::PERIOD, sts);
 }
 
 void Parser::block(const StopSet &sts)
 {
+  printNT("Block");
   match(Symbol::BEGIN, stsUnion(stsUnion(stsUnion(sts, firstDefinitionPart), firstStatementPart), stsTerminal(Symbol::END)));
   definitionPart(stsUnion(stsUnion(sts, firstStatementPart), stsTerminal(Symbol::END)));
   statementPart(stsUnion(sts, stsTerminal(Symbol::END)));
@@ -116,9 +124,42 @@ void Parser::block(const StopSet &sts)
 
 void Parser::definitionPart(const StopSet &sts)
 {
+  printNT("Definition Part");
+  StopSet newSts = stsUnion(sts, firstDefinition);
+  syntaxCheck(newSts);
+  while (member(laToken.getSname(), firstDefinition))
+  {
+    definitionPart(newSts);
+  }
 }
 void Parser::definition(const StopSet &sts)
 {
+  printNT("Definition");
+  bool parseError = false;
+  if (member(laToken.getSname(), firstConstantDefinition))
+  {
+    constantDefinition(sts);
+  }
+  else if (member(laToken.getSname(), firstVariableDefinition))
+  {
+    variableDefinition(sts);
+  }
+  else if (member(laToken.getSname(), firstProcedureDefinition))
+  {
+    procedureDefinition(sts);
+  }
+  else
+  {
+    parseError = true;
+  }
+  if ((!member(Symbol::EPSILON, stsUnion(stsUnion(firstConstantDefinition, firstVariableDefinition), firstProcedureDefinition))) && parseError)
+  {
+    syntaxError(sts);
+  }
+  else
+  {
+    syntaxCheck(sts);
+  }
 }
 void Parser::constantDefinition(const StopSet &sts)
 {
