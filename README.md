@@ -26,4 +26,6 @@ Time Tracking (Parser):
 20/2/19 5 hours
 21/2/19 4 hours
 22/2/19 5 hours
+25/2/19 2 hours
+26/2/19 3 hours
 ```
