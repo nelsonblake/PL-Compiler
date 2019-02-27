@@ -60,7 +60,6 @@ Token Parser::getValidToken()
 void Parser::syntaxError(const StopSet &sts)
 {
   cout << "Error: " << laToken.getSname() << endl;
-  printSts(sts);
   exit(1);
 }
 
@@ -109,7 +108,7 @@ void Parser::printSts(const StopSet &sts)
 {
   for (auto i = sts.begin(); i != sts.end(); ++i)
   {
-    cout << *i << ' ';
+    cout << *i << ' ' << endl;
   }
   cout << endl;
 }
@@ -150,12 +149,11 @@ void Parser::block(const StopSet &sts)
 void Parser::definitionPart(const StopSet &sts)
 {
   printNT("Definition Part");
-  StopSet newSts = stsUnion(sts, firstDefinition);
-  syntaxCheck(newSts);
+  syntaxCheck(stsUnion(sts, firstDefinition));
   while (member(laToken.getSname(), firstDefinition))
   {
-    definition(stsUnion(newSts, stsTerminal(Symbol::SEMICOLON)));
-    match(Symbol::SEMICOLON, newSts);
+    definition(stsUnion(stsTerminal(Symbol::SEMICOLON), sts));
+    match(Symbol::SEMICOLON, stsUnion(firstDefinition, sts));
   }
 }
 
@@ -286,8 +284,8 @@ void Parser::statementPart(const StopSet &sts)
   syntaxCheck(stsUnion(sts, firstStatement));
   while (member(laToken.getSname(), firstStatement))
   {
-    statement(stsUnion(sts, firstStatement));
-    match(Symbol::SEMICOLON, sts);
+    statement(stsUnion(stsTerminal(Symbol::SEMICOLON), sts));
+    match(Symbol::SEMICOLON, stsUnion(firstStatement, sts));
   }
 }
 
@@ -351,7 +349,7 @@ void Parser::statement(const StopSet &sts)
 
 void Parser::emptyStatement(const StopSet &sts)
 {
-  printNT("Empty Staeement");
+  printNT("Empty Statement");
   match(Symbol::SKIP, sts);
 }
 
@@ -689,7 +687,7 @@ void Parser::indexedSelector(const StopSet &sts)
   printNT("Indexed Selector");
   match(Symbol::OPEN_SQUARE_BRACKET, stsUnion(stsUnion(firstExpression, sts), stsTerminal(Symbol::CLOSE_SQUARE_BRACKET)));
   expression(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts));
-  match(Symbol::CLOSE_SQUARE_BRACKET, stsTerminal(Symbol::CLOSE_SQUARE_BRACKET));
+  match(Symbol::CLOSE_SQUARE_BRACKET, sts);
 }
 
 void Parser::constant(const StopSet &sts)
