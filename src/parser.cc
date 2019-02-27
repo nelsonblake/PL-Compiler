@@ -46,8 +46,13 @@ void Parser::handleScanError(Token &t)
 Token Parser::getValidToken()
 {
   Token t = admin.getScanner().getToken();
+
   while (t.getSname() == Symbol::NEWLINE || t.getSname() == Symbol::NONAME)
   {
+    if (admin.getInputFilePtr()->eof())
+    {
+      return Token(Symbol::END_OF_INPUT, Attribute());
+    }
     t = admin.getScanner().getToken();
   }
   if (t.getSname() == ID)
@@ -66,6 +71,10 @@ void Parser::syntaxError(const StopSet &sts)
 void Parser::syntaxCheck(const StopSet &sts)
 {
   Symbol laSymbol = laToken.getSname();
+  if (laSymbol == Symbol::END_OF_INPUT)
+  {
+    return;
+  }
   if (!member(laSymbol, sts))
   {
     syntaxError(sts);
