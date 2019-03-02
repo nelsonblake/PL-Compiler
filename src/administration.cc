@@ -50,15 +50,17 @@ void Administration::incrementCurrentLine()
 
 void Administration::error(const ErrorTypes &eType, const string &s, const Token &t)
 {
+  string errorType(s);
+  Token temp(t);
   if (eType == ErrorTypes::ScanError)
   {
-    string errorType(s);
-    Token temp(t);
     cout << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl;
   }
 
-  // Ignore the rest of the line
-  inputFilePtr->ignore(256, '\n');
-  currentLine++;
+  else if (eType == ErrorTypes::ParseError)
+  {
+    cout << "Parser encountered an error at line " << currentLine << endl;
+  }
+
   errorCount++;
 }

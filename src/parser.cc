@@ -27,28 +27,16 @@ int Parser::parse()
 }
 
 // Private Methods
-void Parser::handleScanError(Token &t)
-{
-  if (t.getSname() == INVALID_CHAR)
-  {
-    admin.error(ErrorTypes::ScanError, "Invalid character", t);
-  }
-  else if (t.getSname() == INVALID_ID)
-  {
-    admin.error(ErrorTypes::ScanError, "Invalid identifier", t);
-  }
-  else if (t.getSname() == INVALID_NUM)
-  {
-    admin.error(ErrorTypes::ScanError, "Invalid number", t);
-  }
-}
-
 Token Parser::getValidToken()
 {
   Token t = admin.getScanner().getToken();
 
   while (t.getSname() == Symbol::NEWLINE || t.getSname() == Symbol::NONAME)
   {
+    if (t.getSname() == Symbol::NEWLINE)
+    {
+      admin.incrementCurrentLine();
+    }
     if (admin.getInputFilePtr()->eof())
     {
       return Token(Symbol::END_OF_INPUT, Attribute());
@@ -64,8 +52,28 @@ Token Parser::getValidToken()
 
 void Parser::syntaxError(const StopSet &sts)
 {
-  cout << "Error: " << laToken.getSname() << endl;
-  exit(1);
+  Symbol laSymbol = laToken.getSname();
+  if (laSymbol == INVALID_CHAR)
+  {
+    admin.error(ErrorTypes::ScanError, "Invalid character", laToken);
+  }
+  else if (laSymbol == INVALID_ID)
+  {
+    admin.error(ErrorTypes::ScanError, "Invalid identifier", laToken);
+  }
+  else if (laSymbol == INVALID_NUM)
+  {
+    admin.error(ErrorTypes::ScanError, "Invalid number", laToken);
+  }
+  else
+  {
+    admin.error(ErrorTypes::ParseError, "", Token());
+  }
+  while (!member(laSymbol, sts))
+  {
+    laToken = admin.getScanner().getToken();
+    laSymbol = laToken.getSname();
+  }
 }
 
 void Parser::syntaxCheck(const StopSet &sts)
@@ -124,12 +132,11 @@ void Parser::printSts(const StopSet &sts)
 
 void Parser::match(const Symbol &s, const StopSet &sts)
 {
-  cout << "Terminal: " << laToken.getSval().getLexeme() << " " << laToken.getSval().getValue() << endl;
+  //cout << "Terminal: " << laToken.getSval().getLexeme() << " " << laToken.getSval().getValue() << endl;
   Symbol laSymbol = laToken.getSname();
   if (laSymbol == s)
   {
     laToken = getValidToken();
-    handleScanError(laToken);
   }
   else
   {
@@ -141,14 +148,14 @@ void Parser::match(const Symbol &s, const StopSet &sts)
 // Non-Terminal Parsing Functions
 void Parser::program(const StopSet &sts)
 {
-  printNT("Program");
+  //printNT("Program");
   block(sts);
   match(Symbol::PERIOD, sts);
 }
 
 void Parser::block(const StopSet &sts)
 {
-  printNT("Block");
+  //printNT("Block");
   match(Symbol::BEGIN, stsUnion(stsUnion(stsUnion(sts, firstDefinitionPart), firstStatementPart), stsTerminal(Symbol::END)));
   definitionPart(stsUnion(stsUnion(sts, firstStatementPart), stsTerminal(Symbol::END)));
   statementPart(stsUnion(sts, stsTerminal(Symbol::END)));
@@ -157,7 +164,7 @@ void Parser::block(const StopSet &sts)
 
 void Parser::definitionPart(const StopSet &sts)
 {
-  printNT("Definition Part");
+  //printNT("Definition Part");
   syntaxCheck(stsUnion(sts, firstDefinition));
   while (member(laToken.getSname(), firstDefinition))
   {
@@ -168,7 +175,7 @@ void Parser::definitionPart(const StopSet &sts)
 
 void Parser::definition(const StopSet &sts)
 {
-  printNT("Definition");
+  //printNT("Definition");
   bool parseError = false;
   if (member(laToken.getSname(), firstConstantDefinition))
   {
@@ -198,7 +205,7 @@ void Parser::definition(const StopSet &sts)
 
 void Parser::constantDefinition(const StopSet &sts)
 {
-  printNT("Constant Definition");
+  //printNT("Constant Definition");
   match(Symbol::CONST, stsUnion(stsUnion(stsUnion(sts, stsTerminal(Symbol::ID)), stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
   match(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
   match(Symbol::EQUAL_OPERATOR, stsUnion(sts, firstConstant));
@@ -207,14 +214,14 @@ void Parser::constantDefinition(const StopSet &sts)
 
 void Parser::variableDefinition(const StopSet &sts)
 {
-  printNT("Variable Definition");
+  //printNT("Variable Definition");
   typeSymbol(stsUnion(sts, firstArrayOrVariableListDefinition));
   arrayOrVariableListDefinition(sts);
 }
 
 void Parser::arrayOrVariableListDefinition(const StopSet &sts)
 {
-  printNT("Array or Variable List Definition");
+  //printNT("Array or Variable List Definition");
   bool parseError = false;
   if (member(laToken.getSname(), firstVariableList))
   {
@@ -244,7 +251,7 @@ void Parser::arrayOrVariableListDefinition(const StopSet &sts)
 
 void Parser::typeSymbol(const StopSet &sts)
 {
-  printNT("Type Symbol");
+  //printNT("Type Symbol");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::INTEGER)))
   {
@@ -270,7 +277,7 @@ void Parser::typeSymbol(const StopSet &sts)
 
 void Parser::variableList(const StopSet &sts)
 {
-  printNT("Variable List");
+  //printNT("Variable List");
   match(Symbol::ID, stsUnion(stsTerminal(Symbol::COMMA), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
@@ -281,7 +288,7 @@ void Parser::variableList(const StopSet &sts)
 
 void Parser::procedureDefinition(const StopSet &sts)
 {
-  printNT("Procedure Definition");
+  //printNT("Procedure Definition");
   match(Symbol::PROC, stsUnion(stsUnion(stsTerminal(Symbol::ID), firstBlock), sts));
   match(Symbol::ID, stsUnion(sts, firstBlock));
   block(sts);
@@ -289,7 +296,7 @@ void Parser::procedureDefinition(const StopSet &sts)
 
 void Parser::statementPart(const StopSet &sts)
 {
-  printNT("Statement Part");
+  //printNT("Statement Part");
   syntaxCheck(stsUnion(sts, firstStatement));
   while (member(laToken.getSname(), firstStatement))
   {
@@ -300,7 +307,7 @@ void Parser::statementPart(const StopSet &sts)
 
 void Parser::statement(const StopSet &sts)
 {
-  printNT("Statement");
+  //printNT("Statement");
   bool parseError = false;
   if (member(laToken.getSname(), firstEmptyStatement))
   {
@@ -358,20 +365,20 @@ void Parser::statement(const StopSet &sts)
 
 void Parser::emptyStatement(const StopSet &sts)
 {
-  printNT("Empty Statement");
+  //printNT("Empty Statement");
   match(Symbol::SKIP, sts);
 }
 
 void Parser::readStatement(const StopSet &sts)
 {
-  printNT("Read Statement");
+  //printNT("Read Statement");
   match(Symbol::READ, stsUnion(firstVariableAccessList, sts));
   variableAccessList(sts);
 }
 
 void Parser::variableAccessList(const StopSet &sts)
 {
-  printNT("Variable Access List");
+  //printNT("Variable Access List");
   variableAccess(stsUnion(stsTerminal(Symbol::COMMA), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
@@ -382,14 +389,14 @@ void Parser::variableAccessList(const StopSet &sts)
 
 void Parser::writeStatement(const StopSet &sts)
 {
-  printNT("Write Statement");
+  //printNT("Write Statement");
   match(Symbol::WRITE, stsUnion(firstExpressionList, sts));
   expressionList(sts);
 }
 
 void Parser::expressionList(const StopSet &sts)
 {
-  printNT("Expression List");
+  //printNT("Expression List");
   expression(stsUnion(stsTerminal(Symbol::COMMA), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
@@ -400,7 +407,7 @@ void Parser::expressionList(const StopSet &sts)
 
 void Parser::assignmentStatement(const StopSet &sts)
 {
-  printNT("Assignment Statement");
+  //printNT("Assignment Statement");
   variableAccessList(stsUnion(stsUnion(stsTerminal(Symbol::ASSIGNMENT_OPERATOR), firstExpressionList), sts));
   match(Symbol::ASSIGNMENT_OPERATOR, stsUnion(firstExpressionList, sts));
   expressionList(sts);
@@ -408,14 +415,14 @@ void Parser::assignmentStatement(const StopSet &sts)
 
 void Parser::procedureStatement(const StopSet &sts)
 {
-  printNT("Proc Statement");
+  //printNT("Proc Statement");
   match(Symbol::CALL, stsUnion(stsTerminal(Symbol::ID), sts));
   match(Symbol::ID, sts);
 }
 
 void Parser::ifStatement(const StopSet &sts)
 {
-  printNT("If Statement");
+  //printNT("If Statement");
   match(Symbol::IF, stsUnion(stsTerminal(Symbol::FI), stsUnion(firstGuardedCommandList, sts)));
   guardedCommandList(stsUnion(stsTerminal(Symbol::FI), sts));
   match(Symbol::FI, sts);
@@ -423,7 +430,7 @@ void Parser::ifStatement(const StopSet &sts)
 
 void Parser::doStatement(const StopSet &sts)
 {
-  printNT("Do Statement");
+  //printNT("Do Statement");
   match(Symbol::DO, stsUnion(stsTerminal(Symbol::OD), stsUnion(firstGuardedCommandList, sts)));
   guardedCommandList(stsUnion(stsTerminal(Symbol::OD), sts));
   match(Symbol::OD, sts);
@@ -431,7 +438,7 @@ void Parser::doStatement(const StopSet &sts)
 
 void Parser::guardedCommandList(const StopSet &sts)
 {
-  printNT("Guarded Command List");
+  //printNT("Guarded Command List");
   guardedCommand(stsUnion(stsTerminal(Symbol::GUARDED_COMMAND), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::GUARDED_COMMAND)))
   {
@@ -442,7 +449,7 @@ void Parser::guardedCommandList(const StopSet &sts)
 
 void Parser::guardedCommand(const StopSet &sts)
 {
-  printNT("Guarded Command");
+  //printNT("Guarded Command");
   expression(stsUnion(stsUnion(stsTerminal(Symbol::ARROW), firstStatementPart), sts));
   match(Symbol::ARROW, stsUnion(firstStatementPart, sts));
   statementPart(sts);
@@ -450,7 +457,7 @@ void Parser::guardedCommand(const StopSet &sts)
 
 void Parser::expression(const StopSet &sts)
 {
-  printNT("Expression");
+  //printNT("Expression");
   primaryExpression(stsUnion(firstPrimaryOperator, sts));
   while (member(laToken.getSname(), firstPrimaryOperator))
   {
@@ -461,7 +468,7 @@ void Parser::expression(const StopSet &sts)
 
 void Parser::primaryOperator(const StopSet &sts)
 {
-  printNT("Primary Operator");
+  //printNT("Primary Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::AND_OPERATOR)))
   {
@@ -487,7 +494,7 @@ void Parser::primaryOperator(const StopSet &sts)
 
 void Parser::primaryExpression(const StopSet &sts)
 {
-  printNT("Primary Expression");
+  //printNT("Primary Expression");
   simpleExpression(stsUnion(firstRelationalOperator, sts));
   if (member(laToken.getSname(), firstRelationalOperator))
   {
@@ -498,7 +505,7 @@ void Parser::primaryExpression(const StopSet &sts)
 
 void Parser::relationalOperator(const StopSet &sts)
 {
-  printNT("Relational Operator");
+  //printNT("Relational Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::LESS_THAN_OPERATOR)))
   {
@@ -528,7 +535,7 @@ void Parser::relationalOperator(const StopSet &sts)
 
 void Parser::simpleExpression(const StopSet &sts)
 {
-  printNT("Simple Expression");
+  //printNT("Simple Expression");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::SUBTRACTION_OPERATOR)))
   {
@@ -565,7 +572,7 @@ void Parser::simpleExpression(const StopSet &sts)
 
 void Parser::addingOperator(const StopSet &sts)
 {
-  printNT("Adding Operator");
+  //printNT("Adding Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::ADDITION_OPERATOR)))
   {
@@ -591,7 +598,7 @@ void Parser::addingOperator(const StopSet &sts)
 
 void Parser::term(const StopSet &sts)
 {
-  printNT("Term");
+  //printNT("Term");
   factor(stsUnion(firstMultiplyingOperator, sts));
   while (member(laToken.getSname(), firstMultiplyingOperator))
   {
@@ -602,7 +609,7 @@ void Parser::term(const StopSet &sts)
 
 void Parser::multiplyingOperator(const StopSet &sts)
 {
-  printNT("Multiplying Operator");
+  //printNT("Multiplying Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::MULTIPLICATION_OPERATOR)))
   {
@@ -638,7 +645,7 @@ void Parser::multiplyingOperator(const StopSet &sts)
 
 void Parser::factor(const StopSet &sts)
 {
-  printNT("Factor");
+  //printNT("Factor");
   bool parseError = false;
   if (member(laToken.getSname(), firstVariableAccess))
   {
@@ -683,7 +690,7 @@ void Parser::factor(const StopSet &sts)
 
 void Parser::variableAccess(const StopSet &sts)
 {
-  printNT("Variable Access");
+  //printNT("Variable Access");
   match(Symbol::ID, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts));
   if (member(laToken.getSname(), firstIndexedSelector))
   {
@@ -693,7 +700,7 @@ void Parser::variableAccess(const StopSet &sts)
 
 void Parser::indexedSelector(const StopSet &sts)
 {
-  printNT("Indexed Selector");
+  //printNT("Indexed Selector");
   match(Symbol::OPEN_SQUARE_BRACKET, stsUnion(stsUnion(firstExpression, sts), stsTerminal(Symbol::CLOSE_SQUARE_BRACKET)));
   expression(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts));
   match(Symbol::CLOSE_SQUARE_BRACKET, sts);
@@ -701,7 +708,7 @@ void Parser::indexedSelector(const StopSet &sts)
 
 void Parser::constant(const StopSet &sts)
 {
-  printNT("Constant");
+  //printNT("Constant");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::NUM)))
   {
@@ -731,7 +738,7 @@ void Parser::constant(const StopSet &sts)
 
 void Parser::booleanSymbol(const StopSet &sts)
 {
-  printNT("Boolean Symbol");
+  //printNT("Boolean Symbol");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::FALSE)))
   {

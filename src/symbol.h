@@ -64,4 +64,5 @@ enum Symbol : int
   EPSILON,
   END_OF_INPUT
 };
+
 #endif

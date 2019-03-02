@@ -33,7 +33,6 @@ private:
   void match(const Symbol &, const StopSet &);
   void syntaxError(const StopSet &);
   void syntaxCheck(const StopSet &);
-  void handleScanError(Token &);
   Token getValidToken();
   StopSet stsUnion(const StopSet &, const StopSet &);
   StopSet stsTerminal(const Symbol &);
