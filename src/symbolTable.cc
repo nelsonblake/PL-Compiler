@@ -138,7 +138,7 @@ int SymbolTable::hash(const string &lexeme)
   int value = 0;
   for (unsigned int i = 0; i < lexeme.length(); i++)
   {
-    value = 7 * value + lexeme[i];
+    value = 3 * value + lexeme[i];
   }
   return value;
 }
