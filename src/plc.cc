@@ -38,8 +38,7 @@ int main(int argc, char *argv[])
   }
   else
   {
-    cerr << "Compiler encountered error(s)" << endl;
-    cout << administration.getErrorCount() << endl;
+    cerr << "Compiler encountered " << administration.getErrorCount() << " error(s)" << endl;
   }
 
   return 0;

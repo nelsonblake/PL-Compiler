@@ -3,11 +3,6 @@ begin
   const n = 10; integer array A[n];
   integer x, i; Boolean found;
 
-  $ Test Scanner errors:
-    const _badToken = 1;
-    const badNumber = 65537;
-    const invalidChar = @;
-
   $ Test other syntactic structures:
   proc Test
   begin

@@ -1,0 +1,50 @@
+$ PL Program: Linear Search
+begin
+  const n = 10; integer array A[n];
+  integer x, i; Boolean found;
+
+  $ Test Scanner errors:
+    const _badToken = 1;
+    const badNumber = 65537;
+    const invalidChar = @;
+
+  $ Test other syntactic structures:
+  proc Test
+  begin
+    $ Missing semicolon
+    const c = 1
+    const d = 2;
+    c := -1-0;
+    d := 1*c;
+    c := 1/c;
+    d := 1\d;
+    if c&d -> write c; fi;
+    if c|d -> write d; fi;
+    skip;
+  end;
+
+  proc Search
+  begin integer m;
+    i, m := 1, n;
+    $ Missing od
+    do i<m ->
+      if A[i] = x -> m := i; []
+        ~(A[i] = x) -> i := i+1;
+      fi;
+    found := A[i] = x;
+  end;
+
+  $ Input Table:
+  i := 1;
+  do ~(i>n) -> read A[i]; i := i+1; od;
+  
+  $ Test Search:
+  read x;
+  do ~(x = 0) ->
+    call Search;
+    if found -> write x, i; []
+      ~found -> write x;
+    fi;
+    read x;
+  od;
+end.
