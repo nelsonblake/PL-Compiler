@@ -8,18 +8,11 @@
 #include "./administration.h"
 
 // Constructors
-Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanner &s) : scanner(s)
+Administration::Administration(ifstream &inputFile, Scanner &s) : scanner(s)
 {
   inputFilePtr = &inputFile;
-  outputFilePtr = &outputFile;
   currentLine = 1;
   errorCount = 0;
-}
-
-// Destructor
-Administration::~Administration()
-{
-  outputFilePtr = nullptr;
 }
 
 // Public Methods

@@ -30,10 +30,7 @@ class Administration
 {
 public:
   // Constructors
-  Administration(ifstream &, ofstream &, Scanner &);
-
-  // Destructor
-  ~Administration();
+  Administration(ifstream &, Scanner &);
 
   // Public Methods
   Scanner getScanner();
@@ -46,7 +43,6 @@ public:
 private:
   // Data Members
   ifstream *inputFilePtr;
-  ofstream *outputFilePtr;
   Scanner &scanner;
   int currentLine;
   int errorCount;

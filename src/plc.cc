@@ -13,9 +13,9 @@
 int main(int argc, char *argv[])
 {
   // If incorrect arguments are specified:
-  if (argc != 3)
+  if (argc != 2)
   {
-    cout << "Please use the following format: " << argv[0] << " <input-file> <output-file>" << endl;
+    cout << "Please use the following format: " << argv[0] << " <input-file>" << endl;
   }
 
   // Open input and output files
@@ -26,16 +26,10 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  ofstream outputFile(argv[2]);
-  if (!outputFile)
-  {
-    cerr << "Output file" << argv[2] << " could not be opened." << endl;
-    return 1;
-  }
   SymbolTable table;
 
   Scanner scanner(inputFile, table);
-  Administration administration(inputFile, outputFile, scanner);
+  Administration administration(inputFile, scanner);
   Parser parser(administration);
   int status = parser.parse();
   if (status == 0)
