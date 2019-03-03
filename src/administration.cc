@@ -47,12 +47,16 @@ void Administration::error(const ErrorTypes &eType, const string &s, const Token
   Token temp(t);
   if (eType == ErrorTypes::ScanError)
   {
-    cout << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl;
+    cout << endl
+         << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl
+         << endl;
   }
 
   else if (eType == ErrorTypes::ParseError)
   {
-    cout << "Parser encountered an error at line " << currentLine << endl;
+    cout << endl
+         << "Parser encountered an error at line " << currentLine << endl
+         << endl;
   }
 
   errorCount++;
