@@ -8,22 +8,28 @@
 
 using namespace std;
 
+const int MAXBLOCK = 15;
+
 class BlockTable
 {
 public:
   BlockTable(); //initialize empty blockTable;
 
   bool search(const int &index); //check if index is in current Block
-  bool insert(TableEntry &entry); //isert an entry into table, return true if index does not exist
-  TableEntry find(const int &index, const bool &error);
+  bool insert(const int &index, const int &arrSize, const int &constVal, const mKind &kind, const mType &type); //insert an entry into table, return true if index does not exist
+  bool find(const int &index, const bool &error);
   bool newBlock();
-  bool endBlock();
-  int currentDepth();
+  void endBlock();
+  int currentBlockLevel();
+
+  void printBlock();
+  void printTable();
+  int tableSize();
+  int blockSize();
 
 private:
-  stack<vector<TableEntry>> table;
-  vector<TableEntry> block;
-  int depth;
+  vector<vector<TableEntry>> table; //a stack but easier to access
+  int blockLevel;
 };
 
 #endif

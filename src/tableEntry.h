@@ -3,10 +3,11 @@
 
 #include "./mKind.h"
 #include "./mType.h"
+#include <iostream>
 
 using namespace std;
 
-#define MAXDEPTH 20;
+const int MAXDEPTH = 20;
 
 class TableEntry
 {
@@ -21,6 +22,8 @@ public:
   int getDepth();
   mKind getKind();
   mType getType();
+
+  void printEntry();
 
 private:
 

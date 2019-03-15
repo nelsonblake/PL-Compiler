@@ -25,21 +25,35 @@ int main(int argc, char *argv[])
     cerr << "Input file " << argv[1] << " could not be opened." << endl;
     return 1;
   }
+  //
+  // SymbolTable table;
+  //
+  // Scanner scanner(inputFile, table);
+  // Administration administration(inputFile, scanner);
+  // Parser parser(administration);
+  // int status = parser.parse();
+  // if (status == 0)
+  // {
+  //   cout << "Parsing completed successfully." << endl;
+  // }
+  // else
+  // {
+  //   cerr << "Compiler encountered " << administration.getErrorCount() << " error(s)" << endl;
+  // }
 
-  SymbolTable table;
+  BlockTable table;
+  bool woah;
+  woah = table.newBlock();
 
-  Scanner scanner(inputFile, table);
-  Administration administration(inputFile, scanner);
-  Parser parser(administration);
-  int status = parser.parse();
-  if (status == 0)
-  {
-    cout << "Parsing completed successfully." << endl;
-  }
-  else
-  {
-    cerr << "Compiler encountered " << administration.getErrorCount() << " error(s)" << endl;
-  }
+  cout << "table size: " << table.tableSize() << endl;
+
+  woah = table.insert(1, 1, 1, mKind::VARKIND, mType::INT);
+  woah = table.insert(1, 1, 1, mKind::VARKIND, mType::INT);
+  woah = table.insert(2, 2, 1, mKind::VARKIND, mType::INT);
+
+
+  cout << "current block size: " << table.blockSize() << endl;
+
 
   return 0;
 }

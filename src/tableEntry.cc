@@ -6,7 +6,7 @@ TableEntry::TableEntry()
   arrSize = 0;
   constVal = 0;
   depth = 0;
-  kind = VAR;
+  kind = VARKIND;
   type = UNIV;
 }
 
@@ -56,4 +56,14 @@ mKind TableEntry::getKind()
 mType TableEntry::getType()
 {
   return type;
+}
+
+void TableEntry::printEntry()
+{
+  cout << endl
+        << "Index: " << index << endl
+        << "Array Size: " << arrSize << endl
+        << "Constant Value: " << constVal << endl
+        << "Kind: " << kind << endl
+        << "Type: " << type << endl;
 }
