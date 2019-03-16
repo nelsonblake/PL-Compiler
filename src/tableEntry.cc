@@ -60,11 +60,10 @@ mType TableEntry::getType()
 
 void TableEntry::printEntry()
 {
-  cout << endl
-        << "Index: " << index << endl
+  cout  << "Index: " << index << endl
         << "Array Size: " << arrSize << endl
         << "Constant Value: " << constVal << endl
         << "Block level: " << depth << endl
         << "Kind: " << kind << endl
-        << "Type: " << type << endl;
+        << "Type: " << type << endl << endl;
 }

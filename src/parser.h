@@ -13,6 +13,7 @@
 #include "./administration.h"
 #include "./token.h"
 #include "./firstSets.h"
+#include "./blockTable.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ private:
   // Private Methods
   bool member(const Symbol &, StopSet);
   void match(const Symbol &, const StopSet &);
+  void matchName(const Symbol&, const StopSet&, int &); //if it doesn't work out, go back to two ints
   void syntaxError(const StopSet &);
   void syntaxCheck(const StopSet &);
   Token getValidToken();
@@ -80,6 +82,7 @@ private:
   // Data Members
   Token laToken;
   Administration &admin;
+  BlockTable table;
 };
 
 #endif

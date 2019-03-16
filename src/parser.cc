@@ -155,11 +155,35 @@ void Parser::match(const Symbol &s, const StopSet &sts)
   syntaxCheck(sts);
 }
 
+void Parser::matchName(const Symbol &s, const StopSet &sts, int &index)
+{
+  index = admin.getScanner().getSymbolTablePtr()->search(laToken.getSval().getLexeme());
+  cout << "Matching Terminal: " << laToken.getSval().getLexeme() << " at index: " << index << endl;
+
+  Symbol laSymbol = laToken.getSname();
+  if (laSymbol == s)
+  {
+    laToken = getValidToken();
+  }
+  else
+  {
+    syntaxError(sts);
+  }
+  syntaxCheck(sts);
+}
+
 // Non-Terminal Parsing Functions
 void Parser::program(const StopSet &sts)
 {
   printNT("Program");
+
+  if(table.newBlock() == false)
+    admin.fatal("Exceeded Block Limit");
+
   block(sts);
+
+  table.endBlock();
+
   match(Symbol::PERIOD, sts);
 }
 
@@ -215,11 +239,25 @@ void Parser::definition(const StopSet &sts)
 
 void Parser::constantDefinition(const StopSet &sts)
 {
+  int tempVal;
+  int index;
+
   printNT("Constant Definition");
   match(Symbol::CONST, stsUnion(stsUnion(stsUnion(sts, stsTerminal(Symbol::ID)), stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
-  match(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
+
+  Token tempTok = laToken;
+  matchName(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant), index);
+
+  //match(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
   match(Symbol::EQUAL_OPERATOR, stsUnion(sts, firstConstant));
+  tempVal = laToken.getSval().getValue();
+  if(!table.insert(index, 0, tempVal, mKind::CONSTKIND, mType::INT)) //this constant value is wrong, it should be n=10, but not sure how to get to the 10 first
+    {
+        admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", tempTok);
+    }
+  table.printTable(); //just to check the constant value
   constant(sts);
+
 }
 
 void Parser::variableDefinition(const StopSet &sts)

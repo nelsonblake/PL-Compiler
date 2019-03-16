@@ -22,7 +22,7 @@ bool BlockTable::insert(const int &index, const int &arrSize, const int &constVa
 {
   if(table.back().empty())
   {
-    cout << "empty block" << endl;
+    cout << "Empty block, insert successful" << endl;
     TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, kind, type);
     table.back().push_back(entry);
     return true;
@@ -105,9 +105,10 @@ void BlockTable::printBlock()
 
 void BlockTable::printTable()
 {
+  cout << "---Table---" << endl;
   for(unsigned int i = 0; i < table.size(); i++)
   {
-    cout << endl << "--Block level " << i+1 << ": --" << endl;
+    cout << "--Block level " << i+1 << ": --" << endl;
     for(unsigned int j = 0; j < table[i].size(); j++)
     {
       table[i][j].printEntry();

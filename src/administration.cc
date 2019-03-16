@@ -41,7 +41,7 @@ void Administration::incrementCurrentLine()
   currentLine++;
 }
 
-void Administration::error(const ErrorTypes &eType, const string &s, const Token &t)
+void Administration::error(const ErrorTypes &eType, const string &s, Token t)
 {
   string errorType(s);
   Token temp(t);
@@ -58,6 +58,18 @@ void Administration::error(const ErrorTypes &eType, const string &s, const Token
          << "Parser encountered an error at line " << currentLine << endl
          << endl;
   }
+  else if (eType == ErrorTypes::ScopeError)
+  {
+    cout << endl
+         << "Scope error at line " << currentLine << ": " + s + " " << t.getSval().getLexeme() << endl
+         << endl;
+  }
 
   errorCount++;
+}
+
+void Administration::fatal(const string &s)
+{
+    cout << s << endl;
+    exit(1);
 }
