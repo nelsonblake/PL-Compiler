@@ -44,25 +44,76 @@ int main(int argc, char *argv[])
   // }
 
   BlockTable table;
+
   cout << "table created. size is: " << table.tableSize() << endl;
   (void)table.newBlock();
   cout << "new block created. table size: " << table.tableSize() << endl
        << endl;
-
   cout << "Inserting (1, 1, 1, mKind::VARKIND, mType::INT)" << endl;
   (void)table.insert(1, 1, 1, mKind::VARKIND, mType::INT);
   cout << "current block size: " << table.blockSize() << endl
        << endl;
-
-  cout << "Inserting (1, 1, 1, mKind::VARKIND, mType::INT)" << endl;
-  (void)table.insert(1, 1, 1, mKind::VARKIND, mType::INT);
-  cout << "current block size: " << table.blockSize() << endl
-       << endl;
-
   cout << "Inserting (2, 2, 1, mKind::VARKIND, mType::INT)" << endl;
   (void)table.insert(2, 2, 1, mKind::VARKIND, mType::INT);
   cout << "current block size: " << table.blockSize() << endl
        << endl;
+  cout << "Block Level: " << table.currentBlockLevel() << endl
+       << endl;
+
+  cout << "--Block: --";
+  table.printBlock();
+  cout << endl;
+
+  // //for testing searchBlock
+  // bool tru, fals;
+  // tru = table.searchBlock(2);
+  // cout << "true or false: " << tru << endl;
+  // fals = table.searchBlock(3);
+  // cout << "true or false: " << fals << endl <<endl;
+  //
+  // //for testing searchTable
+  // bool tru2, fals2;
+  // tru2 = table.searchTable(2, 1);
+  // cout << "true or false: " << tru2 << endl;
+  // fals2 = table.searchTable(3, 0);
+  // cout << "true or false: " << fals2 << endl <<endl;
+
+  (void)table.newBlock();
+  cout << "new block created. table size: " << table.tableSize() << endl
+       << endl;
+  cout << "Inserting (1, 1, 1, mKind::VARKIND, mType::INT)" << endl;
+  (void)table.insert(1, 1, 1, mKind::VARKIND, mType::INT);
+  cout << "current block size: " << table.blockSize() << endl
+       << endl;
+  cout << "Block Level: " << table.currentBlockLevel() << endl
+       << endl;
+
+  (void)table.newBlock();
+  cout << "new block created. table size: " << table.tableSize() << endl
+       << endl;
+  cout << "Inserting (2, 2, 1, mKind::VARKIND, mType::INT)" << endl;
+  (void)table.insert(2, 2, 1, mKind::VARKIND, mType::INT);
+  cout << "current block size: " << table.blockSize() << endl
+       << endl;
+  cout << "Block Level: " << table.currentBlockLevel() << endl
+       << endl;
+
+  cout << "---Table: ---" ;
+  table.printTable();
+  cout << endl << endl;
+
+  (void)table.endBlock();
+  cout << "block popped. table size: " << table.tableSize() << endl
+       << endl;
+  (void)table.endBlock();
+  cout << "block popped. table size: " << table.tableSize() << endl
+       << endl;
+
+  cout << "---Table: ---";
+  table.printTable();
+  cout << endl << endl;
+
+
 
   return 0;
 }

@@ -1,10 +1,3 @@
-//************************************************************************************
-// CPSC 4600
-// PL Language Compiler
-// Table Entry Implementation File
-// Written By: Eric Den Haan and Blake Nelson
-//************************************************************************************
-
 #include "./tableEntry.h"
 
 TableEntry::TableEntry()
@@ -68,9 +61,10 @@ mType TableEntry::getType()
 void TableEntry::printEntry()
 {
   cout << endl
-       << "Index: " << index << endl
-       << "Array Size: " << arrSize << endl
-       << "Constant Value: " << constVal << endl
-       << "Kind: " << kind << endl
-       << "Type: " << type << endl;
+        << "Index: " << index << endl
+        << "Array Size: " << arrSize << endl
+        << "Constant Value: " << constVal << endl
+        << "Block level: " << depth << endl
+        << "Kind: " << kind << endl
+        << "Type: " << type << endl;
 }
