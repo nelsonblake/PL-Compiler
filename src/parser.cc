@@ -155,9 +155,9 @@ void Parser::match(const Symbol &s, const StopSet &sts)
   syntaxCheck(sts);
 }
 
-void Parser::matchName(const Symbol &s, const StopSet &sts, int &index)
+int Parser::matchName(const Symbol &s, const StopSet &sts)
 {
-  index = admin.getScanner().getSymbolTablePtr()->search(laToken.getSval().getLexeme());
+  int index = admin.getScanner().getSymbolTablePtr()->search(laToken.getSval().getLexeme());
   cout << "Matching Terminal: " << laToken.getSval().getLexeme() << " at index: " << index << endl;
 
   Symbol laSymbol = laToken.getSname();
@@ -170,6 +170,8 @@ void Parser::matchName(const Symbol &s, const StopSet &sts, int &index)
     syntaxError(sts);
   }
   syntaxCheck(sts);
+
+  return index;
 }
 
 // Non-Terminal Parsing Functions
@@ -177,7 +179,7 @@ void Parser::program(const StopSet &sts)
 {
   printNT("Program");
 
-  if(table.newBlock() == false)
+  if (table.newBlock() == false)
     admin.fatal("Exceeded Block Limit");
 
   block(sts);
@@ -246,40 +248,83 @@ void Parser::constantDefinition(const StopSet &sts)
   match(Symbol::CONST, stsUnion(stsUnion(stsUnion(sts, stsTerminal(Symbol::ID)), stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
 
   Token tempTok = laToken;
-  matchName(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant), index);
+  index = matchName(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
 
-  //match(Symbol::ID, stsUnion(stsUnion(sts, stsTerminal(Symbol::EQUAL_OPERATOR)), firstConstant));
   match(Symbol::EQUAL_OPERATOR, stsUnion(sts, firstConstant));
   tempVal = laToken.getSval().getValue();
-  if(!table.insert(index, 0, tempVal, mKind::CONSTKIND, mType::INT)) //this constant value is wrong, it should be n=10, but not sure how to get to the 10 first
-    {
-        admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", tempTok);
-    }
+  if (!table.insert(index, 0, tempVal, mKind::CONSTKIND, mType::INT))
+  {
+    admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", tempTok);
+  }
   table.printTable(); //just to check the constant value
   constant(sts);
-
 }
 
 void Parser::variableDefinition(const StopSet &sts)
 {
+  mType type;
+
   printNT("Variable Definition");
-  typeSymbol(stsUnion(sts, firstArrayOrVariableListDefinition));
-  arrayOrVariableListDefinition(sts);
+  type = typeSymbol(stsUnion(sts, firstArrayOrVariableListDefinition));
+  arrayOrVariableListDefinition(sts, type);
 }
 
-void Parser::arrayOrVariableListDefinition(const StopSet &sts)
+void Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t)
 {
+  vector<int> indices;
+  int arrSize;
+
   printNT("Array or Variable List Definition");
   bool parseError = false;
+
   if (member(laToken.getSname(), firstVariableList))
   {
-    variableList(sts);
+    indices = variableList(sts);
+    for (unsigned int i = 0; i < indices.size(); i++)
+    {
+      if (!table.insert(indices[i], 0, 0, mKind::VARKIND, t))
+      {
+        admin.error(ErrorTypes::ScopeError, "Ambiguous definition of variable", laToken);
+      }
+    }
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::ARRAY)))
   {
     match(Symbol::ARRAY, stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), stsUnion(firstConstant, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), stsUnion(firstVariableList, sts)))));
-    variableList(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), stsUnion(firstConstant, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts))));
+    indices = variableList(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), stsUnion(firstConstant, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts))));
     match(Symbol::OPEN_SQUARE_BRACKET, stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), stsUnion(firstConstant, sts)));
+
+    // Find the correct array size depending on the token type
+    if (laToken.getSname() == Symbol::NUM)
+    {
+      arrSize = laToken.getSval().getValue();
+    }
+    else if (laToken.getSname() == Symbol::ID)
+    {
+      int index = laToken.getSval().getValue();
+      TableEntry t = table.searchTable(index);
+      if (t.getIndex() != -1)
+      {
+        arrSize = t.getConstVal();
+      }
+      else
+      {
+        admin.error(ErrorTypes::TypeError, "Invalid array size declaration", laToken);
+      }
+    }
+    else
+    {
+      admin.error(ErrorTypes::TypeError, "Invalid array size declaration", laToken);
+    }
+
+    for (unsigned int i = 0; i < indices.size(); i++)
+    {
+      if (!table.insert(indices[i], arrSize, 0, mKind::ARRAYKIND, t))
+      {
+        admin.error(ErrorTypes::ScopeError, "Ambiguous definition of variable", laToken);
+      }
+    }
+
     constant(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts));
     match(Symbol::CLOSE_SQUARE_BRACKET, sts);
   }
@@ -297,17 +342,20 @@ void Parser::arrayOrVariableListDefinition(const StopSet &sts)
   }
 }
 
-void Parser::typeSymbol(const StopSet &sts)
+mType Parser::typeSymbol(const StopSet &sts)
 {
   printNT("Type Symbol");
   bool parseError = false;
+  mType type;
   if (member(laToken.getSname(), stsTerminal(Symbol::INTEGER)))
   {
     match(Symbol::INTEGER, sts);
+    type = mType::INT;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::BOOLEAN)))
   {
     match(Symbol::BOOLEAN, sts);
+    type = mType::BOOL;
   }
   else
   {
@@ -321,30 +369,50 @@ void Parser::typeSymbol(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return type;
 }
 
-void Parser::variableList(const StopSet &sts)
+vector<int> Parser::variableList(const StopSet &sts)
 {
+  int index = 0;
+  vector<int> indices;
+
   printNT("Variable List");
-  match(Symbol::ID, stsUnion(stsTerminal(Symbol::COMMA), sts));
+  index = matchName(Symbol::ID, stsUnion(stsTerminal(Symbol::COMMA), sts));
+  indices.push_back(index);
+
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
     match(Symbol::COMMA, stsUnion(stsTerminal(Symbol::ID), sts));
-    match(Symbol::ID, sts);
+    index = matchName(Symbol::ID, sts);
+    indices.push_back(index);
   }
+  return indices;
 }
 
 void Parser::procedureDefinition(const StopSet &sts)
 {
   printNT("Procedure Definition");
+
   match(Symbol::PROC, stsUnion(stsUnion(stsTerminal(Symbol::ID), firstBlock), sts));
-  match(Symbol::ID, stsUnion(sts, firstBlock));
+
+  int index = matchName(Symbol::ID, stsUnion(sts, firstBlock));
+  if (!table.insert(index, 0, 0, mKind::PROCKIND, mType::UNIV))
+  {
+    admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", laToken);
+  }
+  if (table.newBlock() == false)
+  {
+    admin.fatal("Exceeded Block Limit");
+  }
+
   block(sts);
+  table.endBlock();
 }
 
 void Parser::statementPart(const StopSet &sts)
 {
-  printNT("Statement Part");
+  //printNT("Statement Part");
   syntaxCheck(stsUnion(sts, firstStatement));
   while (member(laToken.getSname(), firstStatement))
   {
@@ -355,7 +423,7 @@ void Parser::statementPart(const StopSet &sts)
 
 void Parser::statement(const StopSet &sts)
 {
-  printNT("Statement");
+  //printNT("Statement");
   bool parseError = false;
   if (member(laToken.getSname(), firstEmptyStatement))
   {
@@ -413,64 +481,111 @@ void Parser::statement(const StopSet &sts)
 
 void Parser::emptyStatement(const StopSet &sts)
 {
-  printNT("Empty Statement");
+  //printNT("Empty Statement");
   match(Symbol::SKIP, sts);
 }
 
 void Parser::readStatement(const StopSet &sts)
 {
-  printNT("Read Statement");
+  //printNT("Read Statement");
   match(Symbol::READ, stsUnion(firstVariableAccessList, sts));
   variableAccessList(sts);
 }
 
-void Parser::variableAccessList(const StopSet &sts)
+vector<mType> Parser::variableAccessList(const StopSet &sts)
 {
   printNT("Variable Access List");
+  vector<mType> types;
+
+  // Grab the type of the current variable
+  TableEntry t = table.searchTable(laToken.getSval().getValue());
+  types.push_back(t.getType());
+
   variableAccess(stsUnion(stsTerminal(Symbol::COMMA), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
     match(Symbol::COMMA, stsUnion(firstVariableAccess, sts));
+
+    TableEntry t = table.searchTable(laToken.getSval().getValue());
+    types.push_back(t.getType());
+
     variableAccess(sts);
   }
+
+  return types;
 }
 
 void Parser::writeStatement(const StopSet &sts)
 {
-  printNT("Write Statement");
+  //printNT("Write Statement");
   match(Symbol::WRITE, stsUnion(firstExpressionList, sts));
   expressionList(sts);
 }
 
-void Parser::expressionList(const StopSet &sts)
+vector<mType> Parser::expressionList(const StopSet &sts)
 {
   printNT("Expression List");
+  vector<mType> types;
+
+  // Grab the type of the current expression
+  TableEntry t = table.searchTable(laToken.getSval().getValue());
+  types.push_back(t.getType());
+
   expression(stsUnion(stsTerminal(Symbol::COMMA), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
     match(Symbol::COMMA, stsUnion(firstExpression, sts));
+
+    TableEntry t = table.searchTable(laToken.getSval().getValue());
+    types.push_back(t.getType());
+
     expression(sts);
   }
+  return types;
 }
 
 void Parser::assignmentStatement(const StopSet &sts)
 {
+
   printNT("Assignment Statement");
-  variableAccessList(stsUnion(stsUnion(stsTerminal(Symbol::ASSIGNMENT_OPERATOR), firstExpressionList), sts));
+  vector<mType> varTypes = variableAccessList(stsUnion(stsUnion(stsTerminal(Symbol::ASSIGNMENT_OPERATOR), firstExpressionList), sts));
   match(Symbol::ASSIGNMENT_OPERATOR, stsUnion(firstExpressionList, sts));
-  expressionList(sts);
+  vector<mType> exprTypes = expressionList(sts);
+
+  bool typesMatch = false;
+  if (varTypes.size() == exprTypes.size())
+  {
+    typesMatch = true;
+    for (unsigned int i = 0; i < varTypes.size(); i++)
+    {
+      for (unsigned int j = 0; j < exprTypes.size(); j++)
+      {
+        cout << "Var Type " << varTypes[i] << endl
+             << "Expr Type " << exprTypes[j] << endl;
+        if (varTypes[i] != exprTypes[j])
+        {
+          typesMatch = false;
+          break;
+        }
+      }
+    }
+  }
+  if (!typesMatch)
+  {
+    admin.error(ErrorTypes::TypeError, "Type mismatch in assignment statement", laToken);
+  }
 }
 
 void Parser::procedureStatement(const StopSet &sts)
 {
-  printNT("Proc Statement");
+  //printNT("Proc Statement");
   match(Symbol::CALL, stsUnion(stsTerminal(Symbol::ID), sts));
   match(Symbol::ID, sts);
 }
 
 void Parser::ifStatement(const StopSet &sts)
 {
-  printNT("If Statement");
+  //printNT("If Statement");
   match(Symbol::IF, stsUnion(stsTerminal(Symbol::FI), stsUnion(firstGuardedCommandList, sts)));
   guardedCommandList(stsUnion(stsTerminal(Symbol::FI), sts));
   match(Symbol::FI, sts);
@@ -478,7 +593,7 @@ void Parser::ifStatement(const StopSet &sts)
 
 void Parser::doStatement(const StopSet &sts)
 {
-  printNT("Do Statement");
+  //printNT("Do Statement");
   match(Symbol::DO, stsUnion(stsTerminal(Symbol::OD), stsUnion(firstGuardedCommandList, sts)));
   guardedCommandList(stsUnion(stsTerminal(Symbol::OD), sts));
   match(Symbol::OD, sts);
@@ -486,7 +601,7 @@ void Parser::doStatement(const StopSet &sts)
 
 void Parser::guardedCommandList(const StopSet &sts)
 {
-  printNT("Guarded Command List");
+  //printNT("Guarded Command List");
   guardedCommand(stsUnion(stsTerminal(Symbol::GUARDED_COMMAND), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::GUARDED_COMMAND)))
   {
@@ -497,7 +612,7 @@ void Parser::guardedCommandList(const StopSet &sts)
 
 void Parser::guardedCommand(const StopSet &sts)
 {
-  printNT("Guarded Command");
+  //printNT("Guarded Command");
   expression(stsUnion(stsUnion(stsTerminal(Symbol::ARROW), firstStatementPart), sts));
   match(Symbol::ARROW, stsUnion(firstStatementPart, sts));
   statementPart(sts);
@@ -505,7 +620,7 @@ void Parser::guardedCommand(const StopSet &sts)
 
 void Parser::expression(const StopSet &sts)
 {
-  printNT("Expression");
+  //printNT("Expression");
   primaryExpression(stsUnion(firstPrimaryOperator, sts));
   while (member(laToken.getSname(), firstPrimaryOperator))
   {
@@ -516,7 +631,7 @@ void Parser::expression(const StopSet &sts)
 
 void Parser::primaryOperator(const StopSet &sts)
 {
-  printNT("Primary Operator");
+  //printNT("Primary Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::AND_OPERATOR)))
   {
@@ -542,7 +657,7 @@ void Parser::primaryOperator(const StopSet &sts)
 
 void Parser::primaryExpression(const StopSet &sts)
 {
-  printNT("Primary Expression");
+  //printNT("Primary Expression");
   simpleExpression(stsUnion(firstRelationalOperator, sts));
   if (member(laToken.getSname(), firstRelationalOperator))
   {
@@ -553,7 +668,7 @@ void Parser::primaryExpression(const StopSet &sts)
 
 void Parser::relationalOperator(const StopSet &sts)
 {
-  printNT("Relational Operator");
+  //printNT("Relational Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::LESS_THAN_OPERATOR)))
   {
@@ -583,7 +698,7 @@ void Parser::relationalOperator(const StopSet &sts)
 
 void Parser::simpleExpression(const StopSet &sts)
 {
-  printNT("Simple Expression");
+  //printNT("Simple Expression");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::SUBTRACTION_OPERATOR)))
   {
@@ -620,7 +735,7 @@ void Parser::simpleExpression(const StopSet &sts)
 
 void Parser::addingOperator(const StopSet &sts)
 {
-  printNT("Adding Operator");
+  //printNT("Adding Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::ADDITION_OPERATOR)))
   {
@@ -646,7 +761,7 @@ void Parser::addingOperator(const StopSet &sts)
 
 void Parser::term(const StopSet &sts)
 {
-  printNT("Term");
+  //printNT("Term");
   factor(stsUnion(firstMultiplyingOperator, sts));
   while (member(laToken.getSname(), firstMultiplyingOperator))
   {
@@ -657,7 +772,7 @@ void Parser::term(const StopSet &sts)
 
 void Parser::multiplyingOperator(const StopSet &sts)
 {
-  printNT("Multiplying Operator");
+  //printNT("Multiplying Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::MULTIPLICATION_OPERATOR)))
   {
@@ -693,7 +808,7 @@ void Parser::multiplyingOperator(const StopSet &sts)
 
 void Parser::factor(const StopSet &sts)
 {
-  printNT("Factor");
+  //printNT("Factor");
   bool parseError = false;
   if (member(laToken.getSname(), firstVariableAccess))
   {
@@ -738,7 +853,7 @@ void Parser::factor(const StopSet &sts)
 
 void Parser::variableAccess(const StopSet &sts)
 {
-  printNT("Variable Access");
+  //printNT("Variable Access");
   match(Symbol::ID, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts));
   if (member(laToken.getSname(), firstIndexedSelector))
   {
@@ -748,7 +863,7 @@ void Parser::variableAccess(const StopSet &sts)
 
 void Parser::indexedSelector(const StopSet &sts)
 {
-  printNT("Indexed Selector");
+  //printNT("Indexed Selector");
   match(Symbol::OPEN_SQUARE_BRACKET, stsUnion(stsUnion(firstExpression, sts), stsTerminal(Symbol::CLOSE_SQUARE_BRACKET)));
   expression(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts));
   match(Symbol::CLOSE_SQUARE_BRACKET, sts);
@@ -756,7 +871,7 @@ void Parser::indexedSelector(const StopSet &sts)
 
 void Parser::constant(const StopSet &sts)
 {
-  printNT("Constant");
+  //printNT("Constant");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::NUM)))
   {
@@ -786,7 +901,7 @@ void Parser::constant(const StopSet &sts)
 
 void Parser::booleanSymbol(const StopSet &sts)
 {
-  printNT("Boolean Symbol");
+  //printNT("Boolean Symbol");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::FALSE)))
   {

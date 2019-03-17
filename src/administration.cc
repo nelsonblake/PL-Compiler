@@ -61,7 +61,13 @@ void Administration::error(const ErrorTypes &eType, const string &s, Token t)
   else if (eType == ErrorTypes::ScopeError)
   {
     cout << endl
-         << "Scope error at line " << currentLine << ": " + s + " " << t.getSval().getLexeme() << endl
+         << "Scope error at line " << currentLine << ": " + s + " " << endl
+         << endl;
+  }
+  else if (eType == ErrorTypes::TypeError)
+  {
+    cout << endl
+         << "Type error at line " << currentLine << ": " + s + " " << endl
          << endl;
   }
 
@@ -70,6 +76,6 @@ void Administration::error(const ErrorTypes &eType, const string &s, Token t)
 
 void Administration::fatal(const string &s)
 {
-    cout << s << endl;
-    exit(1);
+  cout << s << endl;
+  exit(1);
 }

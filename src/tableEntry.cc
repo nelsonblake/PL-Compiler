@@ -2,7 +2,7 @@
 
 TableEntry::TableEntry()
 {
-  index = 0;
+  index = -1;
   arrSize = 0;
   constVal = 0;
   depth = 0;
@@ -60,10 +60,11 @@ mType TableEntry::getType()
 
 void TableEntry::printEntry()
 {
-  cout  << "Index: " << index << endl
-        << "Array Size: " << arrSize << endl
-        << "Constant Value: " << constVal << endl
-        << "Block level: " << depth << endl
-        << "Kind: " << kind << endl
-        << "Type: " << type << endl << endl;
+  cout << "Index: " << index << endl
+       << "Array Size: " << arrSize << endl
+       << "Constant Value: " << constVal << endl
+       << "Block level: " << depth << endl
+       << "Kind: " << kind << endl
+       << "Type: " << type << endl
+       << endl;
 }

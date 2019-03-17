@@ -15,13 +15,13 @@ class BlockTable
 public:
   BlockTable(); //initialize empty blockTable;
 
-  bool searchBlock(const int &index); //check if index is in current Block
-  bool insert(const int &index, const int &arrSize, const int &constVal, const mKind &kind, const mType &type); //insert an entry into table, return true if index does not exist
-  bool searchTable(const int &index, const bool &error);
+  bool searchBlock(const int &);
+  TableEntry searchTable(const int &);                                              //check if index is in current Block
+  bool insert(const int &, const int &, const int &, const mKind &, const mType &); //insert an entry into table, return true if index does not exist
+  int getConstantValue(const int &);
   bool newBlock();
   void endBlock();
   int currentBlockLevel();
-
   void printBlock();
   void printTable();
   int tableSize();

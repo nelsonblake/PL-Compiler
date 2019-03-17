@@ -32,7 +32,7 @@ private:
   // Private Methods
   bool member(const Symbol &, StopSet);
   void match(const Symbol &, const StopSet &);
-  void matchName(const Symbol&, const StopSet&, int &); //if it doesn't work out, go back to two ints
+  int matchName(const Symbol &, const StopSet &);
   void syntaxError(const StopSet &);
   void syntaxCheck(const StopSet &);
   Token getValidToken();
@@ -48,17 +48,17 @@ private:
   void definition(const StopSet &);
   void constantDefinition(const StopSet &);
   void variableDefinition(const StopSet &);
-  void arrayOrVariableListDefinition(const StopSet &);
-  void typeSymbol(const StopSet &);
-  void variableList(const StopSet &);
+  void arrayOrVariableListDefinition(const StopSet &, const mType &);
+  mType typeSymbol(const StopSet &);
+  vector<int> variableList(const StopSet &);
   void procedureDefinition(const StopSet &);
   void statementPart(const StopSet &);
   void statement(const StopSet &);
   void emptyStatement(const StopSet &);
   void readStatement(const StopSet &);
-  void variableAccessList(const StopSet &);
+  vector<mType> variableAccessList(const StopSet &);
   void writeStatement(const StopSet &);
-  void expressionList(const StopSet &);
+  vector<mType> expressionList(const StopSet &);
   void assignmentStatement(const StopSet &);
   void procedureStatement(const StopSet &);
   void ifStatement(const StopSet &);
