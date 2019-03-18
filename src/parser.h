@@ -71,12 +71,12 @@ private:
   void relationalOperator(const StopSet &);
   void simpleExpression(const StopSet &);
   void addingOperator(const StopSet &);
-  void term(const StopSet &);
+  mType term(const StopSet &);
   void multiplyingOperator(const StopSet &);
-  void factor(const StopSet &);
+  mType factor(const StopSet &);
   void variableAccess(const StopSet &);
   void indexedSelector(const StopSet &);
-  void constant(const StopSet &);
+  void constant(const StopSet &, int &, mType &);
   void booleanSymbol(const StopSet &);
 
   // Data Members
