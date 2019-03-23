@@ -55,7 +55,7 @@ void Administration::error(const ErrorTypes &eType, const string &s, Token t)
   else if (eType == ErrorTypes::ParseError)
   {
     cout << endl
-         << "Parser encountered an error at line " << currentLine << endl
+         << "Syntax error from parser at line " << currentLine << endl
          << endl;
   }
   else if (eType == ErrorTypes::ScopeError)

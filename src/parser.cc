@@ -67,7 +67,7 @@ void Parser::syntaxError(const StopSet &sts)
   }
   else
   {
-    admin.error(ErrorTypes::ParseError, "", Token());
+    admin.error(ErrorTypes::ParseError, "", laToken);
   }
   while (!member(laSymbol, sts))
   {
@@ -118,7 +118,7 @@ StopSet Parser::stsTerminal(const Symbol &s)
 
 void Parser::printNT(const string &s)
 {
-  cout << "Parsing: " << s << endl;
+  // cout << "Parsing: " << s << endl;
 }
 
 void Parser::printSts(const StopSet &sts)
@@ -133,14 +133,14 @@ void Parser::printSts(const StopSet &sts)
 void Parser::match(const Symbol &s, const StopSet &sts)
 {
   string lexeme = laToken.getSval().getLexeme();
-  int value = laToken.getSval().getValue();
+  // int value = laToken.getSval().getValue();
   if (lexeme == "")
   {
-    cout << "Matching Terminal: " << value << endl;
+    // cout << "Matching Terminal: " << value << endl;
   }
   else
   {
-    cout << "Matching Terminal: " << lexeme << endl;
+    // cout << "Matching Terminal: " << lexeme << endl;
   }
 
   Symbol laSymbol = laToken.getSname();
@@ -158,7 +158,7 @@ void Parser::match(const Symbol &s, const StopSet &sts)
 int Parser::matchName(const Symbol &s, const StopSet &sts)
 {
   int index = admin.getScanner().getSymbolTablePtr()->search(laToken.getSval().getLexeme());
-  cout << "Matching Terminal: " << laToken.getSval().getLexeme() << " at index: " << index << endl;
+  // cout << "Matching Terminal: " << laToken.getSval().getLexeme() << " at index: " << index << endl;
 
   Symbol laSymbol = laToken.getSname();
   if (laSymbol == s)
@@ -755,7 +755,7 @@ mType Parser::simpleExpression(const StopSet &sts)
     {
       if (type1 != mType::INT)
       {
-        admin.error(ErrorTypes::TypeError, "5 Invalid expression type, should be integer", laToken);
+        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
       }
       addingOperator(stsUnion(firstTerm, sts));
       type2 = term(sts);
