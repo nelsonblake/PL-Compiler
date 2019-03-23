@@ -257,7 +257,6 @@ void Parser::constantDefinition(const StopSet &sts)
   {
     admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", tempTok);
   }
-  table.printTable(); //just to check the constant value
   constant(sts, tempVal, type);
 }
 
@@ -415,7 +414,7 @@ void Parser::procedureDefinition(const StopSet &sts)
 
 void Parser::statementPart(const StopSet &sts)
 {
-  //printNT("Statement Part");
+  printNT("Statement Part");
   syntaxCheck(stsUnion(sts, firstStatement));
   while (member(laToken.getSname(), firstStatement))
   {
@@ -426,7 +425,7 @@ void Parser::statementPart(const StopSet &sts)
 
 void Parser::statement(const StopSet &sts)
 {
-  //printNT("Statement");
+  printNT("Statement");
   bool parseError = false;
   if (member(laToken.getSname(), firstEmptyStatement))
   {
@@ -484,13 +483,13 @@ void Parser::statement(const StopSet &sts)
 
 void Parser::emptyStatement(const StopSet &sts)
 {
-  //printNT("Empty Statement");
+  printNT("Empty Statement");
   match(Symbol::SKIP, sts);
 }
 
 void Parser::readStatement(const StopSet &sts)
 {
-  //printNT("Read Statement");
+  printNT("Read Statement");
   match(Symbol::READ, stsUnion(firstVariableAccessList, sts));
   variableAccessList(sts);
 }
@@ -499,20 +498,16 @@ vector<mType> Parser::variableAccessList(const StopSet &sts)
 {
   printNT("Variable Access List");
   vector<mType> types;
+  mType type;
 
-  // Grab the type of the current variable
-  TableEntry t = table.searchTable(laToken.getSval().getValue());
-  types.push_back(t.getType());
-
-  variableAccess(stsUnion(stsTerminal(Symbol::COMMA), sts));
+  type = variableAccess(stsUnion(stsTerminal(Symbol::COMMA), sts));
+  types.push_back(type);
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
     match(Symbol::COMMA, stsUnion(firstVariableAccess, sts));
 
-    TableEntry t = table.searchTable(laToken.getSval().getValue());
-    types.push_back(t.getType());
-
-    variableAccess(sts);
+    type = variableAccess(sts);
+    types.push_back(type);
   }
 
   return types;
@@ -520,7 +515,7 @@ vector<mType> Parser::variableAccessList(const StopSet &sts)
 
 void Parser::writeStatement(const StopSet &sts)
 {
-  //printNT("Write Statement");
+  printNT("Write Statement");
   match(Symbol::WRITE, stsUnion(firstExpressionList, sts));
   expressionList(sts);
 }
@@ -529,20 +524,15 @@ vector<mType> Parser::expressionList(const StopSet &sts)
 {
   printNT("Expression List");
   vector<mType> types;
+  mType type;
 
-  // Grab the type of the current expression
-  TableEntry t = table.searchTable(laToken.getSval().getValue());
-  types.push_back(t.getType());
-
-  expression(stsUnion(stsTerminal(Symbol::COMMA), sts));
+  type = expression(stsUnion(stsTerminal(Symbol::COMMA), sts));
+  types.push_back(type);
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
     match(Symbol::COMMA, stsUnion(firstExpression, sts));
-
-    TableEntry t = table.searchTable(laToken.getSval().getValue());
-    types.push_back(t.getType());
-
-    expression(sts);
+    type = expression(sts);
+    types.push_back(type);
   }
   return types;
 }
@@ -563,8 +553,6 @@ void Parser::assignmentStatement(const StopSet &sts)
     {
       for (unsigned int j = 0; j < exprTypes.size(); j++)
       {
-        cout << "Var Type " << varTypes[i] << endl
-             << "Expr Type " << exprTypes[j] << endl;
         if (varTypes[i] != exprTypes[j])
         {
           typesMatch = false;
@@ -588,16 +576,15 @@ void Parser::procedureStatement(const StopSet &sts)
   int index = matchName(Symbol::ID, sts);
   TableEntry t = table.searchTable(index);
 
-  if(t.getIndex() == -1 || t.getKind() != mKind::PROCKIND)
+  if (t.getIndex() == -1 || t.getKind() != mKind::PROCKIND)
   {
     admin.error(ErrorTypes::ScopeError, "Undefined Procedure Name", laToken);
   }
-  //else ALL is WELL
 }
 
 void Parser::ifStatement(const StopSet &sts)
 {
-  //printNT("If Statement");
+  printNT("If Statement");
   match(Symbol::IF, stsUnion(stsTerminal(Symbol::FI), stsUnion(firstGuardedCommandList, sts)));
   guardedCommandList(stsUnion(stsTerminal(Symbol::FI), sts));
   match(Symbol::FI, sts);
@@ -605,7 +592,7 @@ void Parser::ifStatement(const StopSet &sts)
 
 void Parser::doStatement(const StopSet &sts)
 {
-  //printNT("Do Statement");
+  printNT("Do Statement");
   match(Symbol::DO, stsUnion(stsTerminal(Symbol::OD), stsUnion(firstGuardedCommandList, sts)));
   guardedCommandList(stsUnion(stsTerminal(Symbol::OD), sts));
   match(Symbol::OD, sts);
@@ -613,7 +600,7 @@ void Parser::doStatement(const StopSet &sts)
 
 void Parser::guardedCommandList(const StopSet &sts)
 {
-  //printNT("Guarded Command List");
+  printNT("Guarded Command List");
   guardedCommand(stsUnion(stsTerminal(Symbol::GUARDED_COMMAND), sts));
   while (member(laToken.getSname(), stsTerminal(Symbol::GUARDED_COMMAND)))
   {
@@ -625,27 +612,41 @@ void Parser::guardedCommandList(const StopSet &sts)
 void Parser::guardedCommand(const StopSet &sts)
 {
   printNT("Guarded Command");
-  expression(stsUnion(stsUnion(stsTerminal(Symbol::ARROW), firstStatementPart), sts));
-  //here we need to verify that expression returns BOOL, else ERRORTIME.  Need to go deep and finish term, factor, etc..
+  mType type;
+  type = expression(stsUnion(stsUnion(stsTerminal(Symbol::ARROW), firstStatementPart), sts));
+  if (type != mType::BOOL)
+  {
+    admin.error(ErrorTypes::TypeError, "Invalid primary expression type, should be boolean", laToken);
+  }
   match(Symbol::ARROW, stsUnion(firstStatementPart, sts));
   statementPart(sts);
 }
 
-//here we changed expression to return mType, it'll cause hella errors until we finish term, factor, etc...
-void Parser::expression(const StopSet &sts)
+mType Parser::expression(const StopSet &sts)
 {
   printNT("Expression");
-  primaryExpression(stsUnion(firstPrimaryOperator, sts));
+  mType type1;
+  mType type2;
+  type1 = primaryExpression(stsUnion(firstPrimaryOperator, sts));
   while (member(laToken.getSname(), firstPrimaryOperator))
   {
+    if (type1 != mType::BOOL)
+    {
+      admin.error(ErrorTypes::TypeError, "Invalid primary expression type, should be boolean", laToken);
+    }
     primaryOperator(stsUnion(firstPrimaryExpression, sts));
-    primaryExpression(sts);
+    type2 = primaryExpression(sts);
+    if (type2 != mType::BOOL)
+    {
+      admin.error(ErrorTypes::TypeError, "Invalid primary expression type, should be boolean", laToken);
+    }
   }
+  return type1;
 }
 
 void Parser::primaryOperator(const StopSet &sts)
 {
-  //printNT("Primary Operator");
+  printNT("Primary Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::AND_OPERATOR)))
   {
@@ -669,21 +670,32 @@ void Parser::primaryOperator(const StopSet &sts)
   }
 }
 
-//here we also change to return mType
-void Parser::primaryExpression(const StopSet &sts)
+mType Parser::primaryExpression(const StopSet &sts)
 {
   printNT("Primary Expression");
-  simpleExpression(stsUnion(firstRelationalOperator, sts));
+  mType type1;
+  mType type2;
+  type1 = simpleExpression(stsUnion(firstRelationalOperator, sts));
   if (member(laToken.getSname(), firstRelationalOperator))
   {
+    if (type1 != mType::INT)
+    {
+      admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+    }
     relationalOperator(stsUnion(firstSimpleExpression, sts));
-    simpleExpression(sts);
+    type2 = simpleExpression(sts);
+    if (type2 != mType::INT)
+    {
+      admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+    }
+    return mType::BOOL;
   }
+  return type1;
 }
 
 void Parser::relationalOperator(const StopSet &sts)
 {
-  //printNT("Relational Operator");
+  printNT("Relational Operator");
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::LESS_THAN_OPERATOR)))
   {
@@ -711,31 +723,46 @@ void Parser::relationalOperator(const StopSet &sts)
   }
 }
 
-//same as primaryExpr
-void Parser::simpleExpression(const StopSet &sts)
+mType Parser::simpleExpression(const StopSet &sts)
 {
   printNT("Simple Expression");
 
-  mType type;
-
+  mType type1;
+  mType type2;
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::SUBTRACTION_OPERATOR)))
   {
     match(Symbol::SUBTRACTION_OPERATOR, stsUnion(stsUnion(firstTerm, sts), firstAddingOperator));
-    type = term(stsUnion(firstAddingOperator, sts));
+    type1 = term(stsUnion(firstAddingOperator, sts));
     while (member(laToken.getSname(), firstAddingOperator))
     {
+      if (type1 != mType::INT)
+      {
+        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+      }
       addingOperator(stsUnion(firstTerm, sts));
-      type = term(sts);
+      type2 = term(sts);
+      if (type2 != mType::INT)
+      {
+        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+      }
     }
   }
   else if (member(laToken.getSname(), firstTerm))
   {
-    type = term(stsUnion(firstAddingOperator, sts));
+    type1 = term(stsUnion(firstAddingOperator, sts));
     while (member(laToken.getSname(), firstAddingOperator))
     {
+      if (type1 != mType::INT)
+      {
+        admin.error(ErrorTypes::TypeError, "5 Invalid expression type, should be integer", laToken);
+      }
       addingOperator(stsUnion(firstTerm, sts));
-      type = term(sts);
+      type2 = term(sts);
+      if (type2 != mType::INT)
+      {
+        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+      }
     }
   }
   else
@@ -750,6 +777,7 @@ void Parser::simpleExpression(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return type1;
 }
 
 void Parser::addingOperator(const StopSet &sts)
@@ -781,20 +809,24 @@ void Parser::addingOperator(const StopSet &sts)
 mType Parser::term(const StopSet &sts)
 {
   printNT("Term");
+  mType type1;
+  mType type2;
 
-  mType type = mType::INT;
-
-  if(type != mType::INT)
-  {
-    admin.error(ErrorTypes::TypeError, "Ambiguous Variable Type", laToken);
-  }
-  type = factor(stsUnion(firstMultiplyingOperator, sts));
+  type1 = factor(stsUnion(firstMultiplyingOperator, sts));
   while (member(laToken.getSname(), firstMultiplyingOperator))
   {
+    if (type1 != mType::INT)
+    {
+      admin.error(ErrorTypes::TypeError, "Ambiguous variable type", laToken);
+    }
     multiplyingOperator(stsUnion(firstFactor, sts));
-    type = factor(sts);
+    type2 = factor(sts);
+    if (type2 != mType::INT)
+    {
+      admin.error(ErrorTypes::TypeError, "Ambiguous variable type", laToken);
+    }
   }
-  return type;
+  return type1;
 }
 
 void Parser::multiplyingOperator(const StopSet &sts)
@@ -842,24 +874,17 @@ mType Parser::factor(const StopSet &sts)
 
   if (member(laToken.getSname(), firstVariableAccess))
   {
-    variableAccess(sts);
-    type = mType::INT;
-    return type;
+    type = variableAccess(sts);
   }
   else if (member(laToken.getSname(), firstConstant))
   {
     constant(sts, value, type);
-    type = mType::INT;
-    return type;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::OPEN_PARENTHESIS)))
   {
     match(Symbol::OPEN_PARENTHESIS, stsUnion(stsUnion(firstExpression, sts), stsTerminal(Symbol::CLOSE_PARENTHESIS)));
-    //type = expression();
-    expression(stsUnion(stsTerminal(Symbol::CLOSE_PARENTHESIS), sts));
+    type = expression(stsUnion(stsTerminal(Symbol::CLOSE_PARENTHESIS), sts));
     match(Symbol::CLOSE_PARENTHESIS, sts);
-    return type;
-
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::NOT_OPERATOR)))
   {
@@ -886,49 +911,50 @@ mType Parser::factor(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return type;
 }
 
-//return mType, need to do expression
-void Parser::variableAccess(const StopSet &sts)
+mType Parser::variableAccess(const StopSet &sts)
 {
   printNT("Variable Access");
+  mType type;
   int index = matchName(Symbol::ID, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts));
   TableEntry t = table.searchTable(index);
 
-  if(t.getIndex() != -1)
+  if (t.getIndex() != -1)
   {
     if (member(laToken.getSname(), firstIndexedSelector))
     {
-      if(t.getKind() == mKind::ARRAYKIND)
+      if (t.getKind() == mKind::ARRAYKIND)
       {
-        indexedSelector(sts);//without the return we would get a type mismatch because we don't know what Expression evaluates to yet
-        return;
+        type = indexedSelector(sts);
+        if (type != mType::INT)
+        {
+          admin.error(ErrorTypes::TypeError, "Indexed selector must be integer", laToken);
+        }
       }
       else
       {
-        admin.error(ErrorTypes::TypeError,"Ambiguous Variable Type" , laToken);
+        admin.error(ErrorTypes::TypeError, "Ambiguous variable type", laToken);
       }
     }
-
-    if(t.getKind() != mKind::VARKIND && t.getKind() != mKind::CONSTKIND)
-    {
-      admin.error(ErrorTypes::TypeError, "Ambiguous Variable Type" , laToken);
-    }
+    type = t.getType();
   }
   else
   {
-    admin.error(ErrorTypes::ScopeError, "Undefined Variable Name" , laToken);
+    admin.error(ErrorTypes::ScopeError, "Undefined variable name", laToken);
   }
+  return type;
 }
 
-//return mType need to do expression
-void Parser::indexedSelector(const StopSet &sts)
+mType Parser::indexedSelector(const StopSet &sts)
 {
   printNT("Indexed Selector");
+  mType type;
   match(Symbol::OPEN_SQUARE_BRACKET, stsUnion(stsUnion(firstExpression, sts), stsTerminal(Symbol::CLOSE_SQUARE_BRACKET)));
-  expression(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts));
+  type = expression(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts));
   match(Symbol::CLOSE_SQUARE_BRACKET, sts);
-  //return expressions mType
+  return type;
 }
 
 void Parser::constant(const StopSet &sts, int &value, mType &type)
@@ -937,20 +963,27 @@ void Parser::constant(const StopSet &sts, int &value, mType &type)
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::NUM)))
   {
+    type = mType::INT;
+    value = laToken.getSval().getValue();
     match(Symbol::NUM, sts);
   }
-  else if (member(laToken.getSname(), stsTerminal(Symbol::BOOLEAN)))
+  else if (member(laToken.getSname(), firstBooleanSymbol))
   {
-    match(Symbol::BOOLEAN, sts);
+    type = mType::BOOL;
+    value = booleanSymbol(sts);
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::ID)))
   {
     int index = matchName(Symbol::ID, sts);
     TableEntry t = table.searchTable(index);
-    if(t.getType() == mType::INT)
+    if (t.getType() == mType::INT)
     {
       value = t.getConstVal();
       type = t.getType();
+    }
+    else
+    {
+      admin.error(ErrorTypes::TypeError, "Identifer should have integer value", laToken);
     }
   }
   else
@@ -967,17 +1000,20 @@ void Parser::constant(const StopSet &sts, int &value, mType &type)
   }
 }
 
-void Parser::booleanSymbol(const StopSet &sts)
+int Parser::booleanSymbol(const StopSet &sts)
 {
   printNT("Boolean Symbol");
+  int value = 0;
   bool parseError = false;
   if (member(laToken.getSname(), stsTerminal(Symbol::FALSE)))
   {
     match(Symbol::FALSE, sts);
+    value = 0;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::TRUE)))
   {
     match(Symbol::TRUE, sts);
+    value = 1;
   }
   else
   {
@@ -991,4 +1027,5 @@ void Parser::booleanSymbol(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return value;
 }

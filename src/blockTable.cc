@@ -24,7 +24,6 @@ bool BlockTable::insert(const int &index, const int &arrSize, const int &constVa
   if (table.back().empty())
   {
     canInsert = true;
-    cout << "Empty block, insert successful" << endl;
     TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, kind, type);
     table.back().push_back(entry);
   }
@@ -36,14 +35,12 @@ bool BlockTable::insert(const int &index, const int &arrSize, const int &constVa
     {
       if (index == table.back()[i].getIndex())
       {
-        cout << "Previously defined ID" << endl; //already have this entry
         canInsert = false;
         break;
       }
     }
     if (canInsert)
     {
-      cout << "valid entry" << endl;
       TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, kind, type);
       table.back().push_back(entry);
     }

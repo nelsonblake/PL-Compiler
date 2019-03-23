@@ -65,19 +65,19 @@ private:
   void doStatement(const StopSet &);
   void guardedCommandList(const StopSet &);
   void guardedCommand(const StopSet &);
-  void expression(const StopSet &);
+  mType expression(const StopSet &);
   void primaryOperator(const StopSet &);
-  void primaryExpression(const StopSet &);
+  mType primaryExpression(const StopSet &);
   void relationalOperator(const StopSet &);
-  void simpleExpression(const StopSet &);
+  mType simpleExpression(const StopSet &);
   void addingOperator(const StopSet &);
   mType term(const StopSet &);
   void multiplyingOperator(const StopSet &);
   mType factor(const StopSet &);
-  void variableAccess(const StopSet &);
-  void indexedSelector(const StopSet &);
+  mType variableAccess(const StopSet &);
+  mType indexedSelector(const StopSet &);
   void constant(const StopSet &, int &, mType &);
-  void booleanSymbol(const StopSet &);
+  int booleanSymbol(const StopSet &);
 
   // Data Members
   Token laToken;
