@@ -30,3 +30,14 @@ Time Tracking (Parser):
 26/2/19 3 hours
 2/3/19 3 hours
 ```
+
+Time Tracking (Scope and Type Checking):
+
+```
+8/3/19 4 hours
+11/3/19 1.5 hours
+15/3/19 4 hours
+18/3/19 4 hours
+23/3/19 4 hours
+```
+
