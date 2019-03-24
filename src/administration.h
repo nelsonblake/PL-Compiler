@@ -38,7 +38,8 @@ public:
   int getCurrentLine();
   int getErrorCount();
   void incrementCurrentLine();
-  void error(const ErrorTypes &, const string &, const Token &);
+  void error(const ErrorTypes &, const string &, Token);
+  void fatal(const string &);
 
 private:
   // Data Members

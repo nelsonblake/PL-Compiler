@@ -13,6 +13,7 @@
 #include "./administration.h"
 #include "./token.h"
 #include "./firstSets.h"
+#include "./blockTable.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ private:
   // Private Methods
   bool member(const Symbol &, StopSet);
   void match(const Symbol &, const StopSet &);
+  int matchName(const Symbol &, const StopSet &);
   void syntaxError(const StopSet &);
   void syntaxCheck(const StopSet &);
   Token getValidToken();
@@ -46,40 +48,41 @@ private:
   void definition(const StopSet &);
   void constantDefinition(const StopSet &);
   void variableDefinition(const StopSet &);
-  void arrayOrVariableListDefinition(const StopSet &);
-  void typeSymbol(const StopSet &);
-  void variableList(const StopSet &);
+  void arrayOrVariableListDefinition(const StopSet &, const mType &);
+  mType typeSymbol(const StopSet &);
+  vector<int> variableList(const StopSet &);
   void procedureDefinition(const StopSet &);
   void statementPart(const StopSet &);
   void statement(const StopSet &);
   void emptyStatement(const StopSet &);
   void readStatement(const StopSet &);
-  void variableAccessList(const StopSet &);
+  vector<mType> variableAccessList(const StopSet &);
   void writeStatement(const StopSet &);
-  void expressionList(const StopSet &);
+  vector<mType> expressionList(const StopSet &);
   void assignmentStatement(const StopSet &);
   void procedureStatement(const StopSet &);
   void ifStatement(const StopSet &);
   void doStatement(const StopSet &);
   void guardedCommandList(const StopSet &);
   void guardedCommand(const StopSet &);
-  void expression(const StopSet &);
+  mType expression(const StopSet &);
   void primaryOperator(const StopSet &);
-  void primaryExpression(const StopSet &);
+  mType primaryExpression(const StopSet &);
   void relationalOperator(const StopSet &);
-  void simpleExpression(const StopSet &);
+  mType simpleExpression(const StopSet &);
   void addingOperator(const StopSet &);
-  void term(const StopSet &);
+  mType term(const StopSet &);
   void multiplyingOperator(const StopSet &);
-  void factor(const StopSet &);
-  void variableAccess(const StopSet &);
-  void indexedSelector(const StopSet &);
-  void constant(const StopSet &);
-  void booleanSymbol(const StopSet &);
+  mType factor(const StopSet &);
+  mType variableAccess(const StopSet &);
+  mType indexedSelector(const StopSet &);
+  void constant(const StopSet &, int &, mType &);
+  int booleanSymbol(const StopSet &);
 
   // Data Members
   Token laToken;
   Administration &admin;
+  BlockTable table;
 };
 
 #endif

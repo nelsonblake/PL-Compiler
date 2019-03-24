@@ -12,13 +12,13 @@
 
 int main(int argc, char *argv[])
 {
-  // If incorrect arguments are specified:
+  //If incorrect arguments are specified:
   if (argc != 2)
   {
     cout << "Please use the following format: " << argv[0] << " <input-file>" << endl;
   }
 
-  // Open input and output files
+  //Open input and output files
   ifstream inputFile(argv[1]);
   if (!inputFile)
   {
@@ -26,19 +26,22 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  SymbolTable table;
+  SymbolTable symbolTable;
 
-  Scanner scanner(inputFile, table);
+  Scanner scanner(inputFile, symbolTable);
   Administration administration(inputFile, scanner);
   Parser parser(administration);
   int status = parser.parse();
   if (status == 0)
   {
-    cout << "Parsing completed successfully." << endl;
+    cout << "Scanning, parsing, and type/scope checking successfully completed" << endl;
   }
   else
   {
     cerr << "Compiler encountered " << administration.getErrorCount() << " error(s)" << endl;
+    cout << endl
+         << "Note: scanning and parsing errors are muted for clarity," << endl;
+    cout << "although they will still show in the error count" << endl;
   }
 
   return 0;

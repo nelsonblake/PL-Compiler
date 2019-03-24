@@ -41,23 +41,41 @@ void Administration::incrementCurrentLine()
   currentLine++;
 }
 
-void Administration::error(const ErrorTypes &eType, const string &s, const Token &t)
+void Administration::error(const ErrorTypes &eType, const string &s, Token t)
 {
   string errorType(s);
   Token temp(t);
   if (eType == ErrorTypes::ScanError)
   {
-    cout << endl
-         << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl
-         << endl;
+    // cout << endl
+    //      << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl
+    //      << endl;
   }
 
   else if (eType == ErrorTypes::ParseError)
   {
+    // cout << endl
+    //      << "Syntax error from parser at line " << currentLine << endl
+    //      << endl;
+  }
+  else if (eType == ErrorTypes::ScopeError)
+  {
     cout << endl
-         << "Parser encountered an error at line " << currentLine << endl
+         << "Scope error at line " << currentLine << ": " + s + " " << endl
+         << endl;
+  }
+  else if (eType == ErrorTypes::TypeError)
+  {
+    cout << endl
+         << "Type error at line " << currentLine << ": " + s + " " << endl
          << endl;
   }
 
   errorCount++;
+}
+
+void Administration::fatal(const string &s)
+{
+  cout << s << endl;
+  exit(1);
 }
