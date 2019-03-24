@@ -1,11 +1,20 @@
+//************************************************************************************
+// CPSC 4600
+// PL Language Compiler
+// Block Table Implementation File
+// Written By: Eric Den Haan and Blake Nelson
+//************************************************************************************
+
 #include "./blockTable.h"
 
+// Constructors
 BlockTable::BlockTable()
 {
   table.clear();
   blockLevel = 0;
 }
 
+// Public Methods
 bool BlockTable::searchBlock(const int &index)
 {
   for (unsigned int i = 0; i != table.back().size(); i++)
@@ -65,11 +74,8 @@ TableEntry BlockTable::searchTable(const int &index)
 
 bool BlockTable::newBlock()
 {
-  if (table.size() == MAXBLOCK)
+  if (table.size() >= MAXBLOCK)
   {
-    cout << "Maximum block count exceeded." << endl
-         << endl;
-    exit(1);
     return false;
   }
   else

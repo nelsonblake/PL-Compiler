@@ -1,7 +1,7 @@
 //************************************************************************************
 // CPSC 4600
 // PL Language Compiler
-// Type Enumeration
+// mType Enumeration
 // Written By: Eric Den Haan and Blake Nelson
 //************************************************************************************
 

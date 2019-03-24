@@ -180,7 +180,9 @@ void Parser::program(const StopSet &sts)
   printNT("Program");
 
   if (table.newBlock() == false)
-    admin.fatal("Exceeded Block Limit");
+  {
+    admin.fatal("Fatal error: exceeded block limit");
+  }
 
   block(sts);
 
@@ -405,7 +407,7 @@ void Parser::procedureDefinition(const StopSet &sts)
   }
   if (table.newBlock() == false)
   {
-    admin.fatal("Exceeded Block Limit");
+    admin.fatal("Fatal error: exceeded block limit");
   }
 
   block(sts);
@@ -578,7 +580,7 @@ void Parser::procedureStatement(const StopSet &sts)
 
   if (t.getIndex() == -1 || t.getKind() != mKind::PROCKIND)
   {
-    admin.error(ErrorTypes::ScopeError, "Undefined Procedure Name", laToken);
+    admin.error(ErrorTypes::ScopeError, "Undefined procedure name", laToken);
   }
 }
 
@@ -680,13 +682,13 @@ mType Parser::primaryExpression(const StopSet &sts)
   {
     if (type1 != mType::INT)
     {
-      admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+      admin.error(ErrorTypes::TypeError, "Invalid simple expression type, should be integer", laToken);
     }
     relationalOperator(stsUnion(firstSimpleExpression, sts));
     type2 = simpleExpression(sts);
     if (type2 != mType::INT)
     {
-      admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+      admin.error(ErrorTypes::TypeError, "Invalid simple expression type, should be integer", laToken);
     }
     return mType::BOOL;
   }
@@ -738,13 +740,13 @@ mType Parser::simpleExpression(const StopSet &sts)
     {
       if (type1 != mType::INT)
       {
-        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+        admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
       addingOperator(stsUnion(firstTerm, sts));
       type2 = term(sts);
       if (type2 != mType::INT)
       {
-        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+        admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
     }
   }
@@ -755,13 +757,13 @@ mType Parser::simpleExpression(const StopSet &sts)
     {
       if (type1 != mType::INT)
       {
-        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+        admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
       addingOperator(stsUnion(firstTerm, sts));
       type2 = term(sts);
       if (type2 != mType::INT)
       {
-        admin.error(ErrorTypes::TypeError, "Invalid expression type, should be integer", laToken);
+        admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
     }
   }
@@ -817,13 +819,13 @@ mType Parser::term(const StopSet &sts)
   {
     if (type1 != mType::INT)
     {
-      admin.error(ErrorTypes::TypeError, "Ambiguous variable type", laToken);
+      admin.error(ErrorTypes::TypeError, "Invalid factor type, should be integer", laToken);
     }
     multiplyingOperator(stsUnion(firstFactor, sts));
     type2 = factor(sts);
     if (type2 != mType::INT)
     {
-      admin.error(ErrorTypes::TypeError, "Ambiguous variable type", laToken);
+      admin.error(ErrorTypes::TypeError, "Invalid factor type, should be integer", laToken);
     }
   }
   return type1;

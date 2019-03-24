@@ -1,5 +1,13 @@
+//************************************************************************************
+// CPSC 4600
+// PL Language Compiler
+// Block Table Entry Implementation File
+// Written By: Eric Den Haan and Blake Nelson
+//************************************************************************************
+
 #include "./tableEntry.h"
 
+// Constructors
 TableEntry::TableEntry()
 {
   index = -1;
@@ -28,6 +36,7 @@ TableEntry::TableEntry(const int &i, const int &d, const mKind &k, const mType &
   type = t;
 }
 
+// Public Methods
 int TableEntry::getIndex()
 {
   return index;

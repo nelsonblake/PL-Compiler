@@ -1,3 +1,10 @@
+//************************************************************************************
+// CPSC 4600
+// PL Language Compiler
+// Block Table Interface File
+// Written By: Eric Den Haan and Blake Nelson
+//************************************************************************************
+
 #ifndef BLOCKTABLE_H
 #define BLOCKTABLE_H
 
@@ -8,16 +15,18 @@
 
 using namespace std;
 
-const int MAXBLOCK = 15;
+const int MAXBLOCK = 20;
 
 class BlockTable
 {
 public:
-  BlockTable(); //initialize empty blockTable;
+  // Constructors
+  BlockTable();
 
+  // Public Methods
   bool searchBlock(const int &);
-  TableEntry searchTable(const int &);                                              //check if index is in current Block
-  bool insert(const int &, const int &, const int &, const mKind &, const mType &); //insert an entry into table, return true if index does not exist
+  TableEntry searchTable(const int &);
+  bool insert(const int &, const int &, const int &, const mKind &, const mType &);
   int getConstantValue(const int &);
   bool newBlock();
   void endBlock();
@@ -28,7 +37,8 @@ public:
   int blockSize();
 
 private:
-  vector<vector<TableEntry>> table; //a stack but easier to access
+  // Private Data Members
+  vector<vector<TableEntry>> table;
   int blockLevel;
 };
 
