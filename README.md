@@ -39,5 +39,6 @@ Time Tracking (Scope and Type Checking):
 15/3/19 4 hours
 18/3/19 4 hours
 23/3/19 4 hours
+24/3/19 2.5 hours
 ```
 
