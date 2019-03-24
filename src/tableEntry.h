@@ -1,7 +1,7 @@
 //************************************************************************************
 // CPSC 4600
 // PL Language Compiler
-// Block Table Interface File
+// Block Table Entry Interface File
 // Written By: Eric Den Haan and Blake Nelson
 //************************************************************************************
 
