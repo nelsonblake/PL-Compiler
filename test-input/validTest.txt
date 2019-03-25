@@ -1,6 +1,7 @@
 $ PL Program: Linear Search (valid)
 begin
-  const n = 10; integer array A[n];
+  const n = 10; 
+  integer array A[n];
   integer x, i; Boolean found;
 
   $ Test other syntactic structures:
@@ -8,12 +9,13 @@ begin
   begin
     const c = 1;
     const d = 2;
-    c := -1-0;
-    d := 1*c;
-    c := 1/c;
-    d := 1\d;
-    if c&d -> write c; fi;
-    if c|d -> write d; fi;
+    integer e, f;
+    e := -1-0;
+    f := 1*c;
+    e := 1/c;
+    f := 1\d;
+    if c > e & d < f -> write c; fi;
+    if c = e | d = f -> write d; fi;
     skip;
   end;
 

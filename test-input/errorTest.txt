@@ -1,22 +1,44 @@
-$ PL Program: Linear Search (with errors, condensed)
+$ PL Program: Error test
 begin
   const n = 10; integer array A[n];
   integer x, i; Boolean found;
 
-  $ Test Scanner errors:
-    const _badToken = 1;
-    const badNumber = 65537;
-    const invalidChar = @;
+  $ Scope and Type errors
+    $ Invalid array size definition
+    integer array Y[+];
 
-  proc Search
-  $ Missing semicolon
-  begin integer m
-    i, m := 1, n;
-    $ Missing od
-    do i<m ->
-      if A[i] = x -> m := i; []
-        ~(A[i] = x) -> i := i+1;
-      $ Missing fi
-    found := A[i] = x;
-  end;
+    $ Re-use of bound identifier
+    integer x;
+
+    $ Should be no error redefining within a new block
+    proc Test
+    begin
+      integer x;
+      skip;
+    end;
+
+    $ Re-definition of proc, should throw error
+    proc Test
+      skip;
+    end;
+    
+    $ Invalid comparison
+    if 
+      found > n -> skip; 
+    fi
+
+    $ Invalid indexed selector
+    A[found] := x + i;
+
+    $ Accessing non-existent array
+    B[i] := i;
+
+    $ Undefined variables
+    A[p] = 1;
+    x = p;
+
+    $ Assignment statement errors
+    found := n;
+    x, i := 1, FALSE;
+    x := ;
 end.
