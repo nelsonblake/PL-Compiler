@@ -11,6 +11,7 @@
 Parser::Parser(Administration &a) : admin(a)
 {
   laToken = getValidToken();
+  table = BlockTable();
 }
 
 // Public Methods
