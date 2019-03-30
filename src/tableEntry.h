@@ -21,8 +21,7 @@ class TableEntry
 public:
   // Constructors
   TableEntry();
-  TableEntry(const int &, const int &, const int &, const int &, const mKind &, const mType &);
-  TableEntry(const int &, const int &, const mKind &, const mType &);
+  TableEntry(const int &, const int &, const int &, const int &, const int &, const int &, const mKind &, const mType &);
 
   // Public Methods
   int getIndex();
@@ -31,10 +30,16 @@ public:
   int getDepth();
   mKind getKind();
   mType getType();
+  int getDisplacement();
+  int getStartLabel();
+  void setDisplacement(const int &);
+  void setStartLabel(const int &);
   void printEntry();
 
 private:
   // Private Data Members
+  int displacement;
+  int startLabel;
   int index;
   int arrSize;
   int constVal;

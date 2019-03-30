@@ -41,6 +41,9 @@ public:
   void incrementCurrentLine();
   void error(const ErrorTypes &, const string &, Token);
   void fatal(const string &);
+  void emit1(const string &);
+  void emit2(const string &, const int &);
+  void emit3(const string &, const int &, const int &);
 
 private:
   // Data Members

@@ -15,6 +15,8 @@
 #include "./firstSets.h"
 #include "./blockTable.h"
 
+#define MAXLABEL 256
+
 using namespace std;
 
 typedef vector<Symbol> StopSet;
@@ -43,12 +45,12 @@ private:
 
   // Non-Terminal Parsing Functions
   void program(const StopSet &);
-  void block(const StopSet &);
-  void definitionPart(const StopSet &);
-  void definition(const StopSet &);
+  void block(const StopSet &, const int &, const int &);
+  int definitionPart(const StopSet &);
+  int definition(const StopSet &, int &);
   void constantDefinition(const StopSet &);
-  void variableDefinition(const StopSet &);
-  void arrayOrVariableListDefinition(const StopSet &, const mType &);
+  int variableDefinition(const StopSet &, int &);
+  int arrayOrVariableListDefinition(const StopSet &, const mType &, int &);
   mType typeSymbol(const StopSet &);
   vector<int> variableList(const StopSet &);
   void procedureDefinition(const StopSet &);
@@ -63,26 +65,28 @@ private:
   void procedureStatement(const StopSet &);
   void ifStatement(const StopSet &);
   void doStatement(const StopSet &);
-  void guardedCommandList(const StopSet &);
-  void guardedCommand(const StopSet &);
+  void guardedCommandList(const StopSet &, int &, const int &);
+  void guardedCommand(const StopSet &, int &, const int &);
   mType expression(const StopSet &);
-  void primaryOperator(const StopSet &);
+  Symbol primaryOperator(const StopSet &);
   mType primaryExpression(const StopSet &);
-  void relationalOperator(const StopSet &);
+  Symbol relationalOperator(const StopSet &);
   mType simpleExpression(const StopSet &);
-  void addingOperator(const StopSet &);
+  Symbol addingOperator(const StopSet &);
   mType term(const StopSet &);
-  void multiplyingOperator(const StopSet &);
+  Symbol multiplyingOperator(const StopSet &);
   mType factor(const StopSet &);
   mType variableAccess(const StopSet &);
   mType indexedSelector(const StopSet &);
   void constant(const StopSet &, int &, mType &);
   int booleanSymbol(const StopSet &);
+  int newLabel();
 
   // Data Members
   Token laToken;
   Administration &admin;
   BlockTable table;
+  int currentLabel;
 };
 
 #endif

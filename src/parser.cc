@@ -12,6 +12,7 @@ Parser::Parser(Administration &a) : admin(a)
 {
   laToken = getValidToken();
   table = BlockTable();
+  currentLabel = 0;
 }
 
 // Public Methods
@@ -179,50 +180,66 @@ int Parser::matchName(const Symbol &s, const StopSet &sts)
 void Parser::program(const StopSet &sts)
 {
   printNT("Program");
+  int varLabel, startLabel;
+  varLabel = newLabel();
+  startLabel = newLabel();
+
+  // Emit the PROG instruction
+  admin.emit3("PROG", varLabel, startLabel);
 
   if (table.newBlock() == false)
   {
     admin.fatal("Fatal error: exceeded block limit");
   }
 
-  block(sts);
+  block(sts, startLabel, varLabel);
 
   table.endBlock();
 
   match(Symbol::PERIOD, sts);
+
+  // Emit the ENDPROG instruction
+  admin.emit1("ENDPROG");
 }
 
-void Parser::block(const StopSet &sts)
+void Parser::block(const StopSet &sts, const int &startLabel, const int &varLabel)
 {
   printNT("Block");
+  int varLength = 0;
   match(Symbol::BEGIN, stsUnion(stsUnion(stsUnion(sts, firstDefinitionPart), firstStatementPart), stsTerminal(Symbol::END)));
-  definitionPart(stsUnion(stsUnion(sts, firstStatementPart), stsTerminal(Symbol::END)));
+  varLength = definitionPart(stsUnion(stsUnion(sts, firstStatementPart), stsTerminal(Symbol::END)));
+  admin.emit3("DEFARG", varLabel, varLength);
+  admin.emit2("DEFADDR", startLabel);
   statementPart(stsUnion(sts, stsTerminal(Symbol::END)));
   match(Symbol::END, sts);
 }
 
-void Parser::definitionPart(const StopSet &sts)
+int Parser::definitionPart(const StopSet &sts)
 {
   printNT("Definition Part");
+  int varLength = 0;
+  int nextVarStart = 3;
   syntaxCheck(stsUnion(sts, firstDefinition));
   while (member(laToken.getSname(), firstDefinition))
   {
-    definition(stsUnion(stsTerminal(Symbol::SEMICOLON), sts));
+    varLength += definition(stsUnion(stsTerminal(Symbol::SEMICOLON), sts), nextVarStart);
     match(Symbol::SEMICOLON, stsUnion(firstDefinition, sts));
   }
+  return varLength;
 }
 
-void Parser::definition(const StopSet &sts)
+int Parser::definition(const StopSet &sts, int &varStart)
 {
   printNT("Definition");
   bool parseError = false;
+  int size = 0;
   if (member(laToken.getSname(), firstConstantDefinition))
   {
     constantDefinition(sts);
   }
   else if (member(laToken.getSname(), firstVariableDefinition))
   {
-    variableDefinition(sts);
+    size = variableDefinition(sts, varStart);
   }
   else if (member(laToken.getSname(), firstProcedureDefinition))
   {
@@ -240,6 +257,7 @@ void Parser::definition(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return size;
 }
 
 void Parser::constantDefinition(const StopSet &sts)
@@ -256,23 +274,25 @@ void Parser::constantDefinition(const StopSet &sts)
 
   match(Symbol::EQUAL_OPERATOR, stsUnion(sts, firstConstant));
   tempVal = laToken.getSval().getValue();
-  if (!table.insert(index, 0, tempVal, mKind::CONSTKIND, mType::INT))
+  if (!table.insert(index, 0, tempVal, -1, -1, mKind::CONSTKIND, mType::INT))
   {
     admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", tempTok);
   }
   constant(sts, tempVal, type);
 }
 
-void Parser::variableDefinition(const StopSet &sts)
+int Parser::variableDefinition(const StopSet &sts, int &varStart)
 {
   mType type;
+  int size;
 
   printNT("Variable Definition");
   type = typeSymbol(stsUnion(sts, firstArrayOrVariableListDefinition));
-  arrayOrVariableListDefinition(sts, type);
+  size = arrayOrVariableListDefinition(sts, type, varStart);
+  return size;
 }
 
-void Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t)
+int Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t, int &varStart)
 {
   vector<int> indices;
   int arrSize;
@@ -285,10 +305,11 @@ void Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t)
     indices = variableList(sts);
     for (unsigned int i = 0; i < indices.size(); i++)
     {
-      if (!table.insert(indices[i], 0, 0, mKind::VARKIND, t))
+      if (!table.insert(indices[i], 0, 0, varStart, 0, mKind::VARKIND, t))
       {
         admin.error(ErrorTypes::ScopeError, "Ambiguous definition of variable", laToken);
       }
+      varStart++;
     }
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::ARRAY)))
@@ -322,12 +343,12 @@ void Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t)
 
     for (unsigned int i = 0; i < indices.size(); i++)
     {
-      if (!table.insert(indices[i], arrSize, 0, mKind::ARRAYKIND, t))
+      if (!table.insert(indices[i], arrSize, 0, varStart, 0, mKind::ARRAYKIND, t))
       {
         admin.error(ErrorTypes::ScopeError, "Ambiguous definition of variable", laToken);
       }
+      varStart++;
     }
-
     int value;
     mType type;
     constant(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts), value, type);
@@ -345,6 +366,7 @@ void Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t)
   {
     syntaxCheck(sts);
   }
+  return indices.size();
 }
 
 mType Parser::typeSymbol(const StopSet &sts)
@@ -389,7 +411,7 @@ vector<int> Parser::variableList(const StopSet &sts)
   while (member(laToken.getSname(), stsTerminal(Symbol::COMMA)))
   {
     match(Symbol::COMMA, stsUnion(stsTerminal(Symbol::ID), sts));
-    index = matchName(Symbol::ID, sts);
+    index = matchName(Symbol::ID, stsUnion(stsTerminal(Symbol::COMMA), sts));
     indices.push_back(index);
   }
   return indices;
@@ -402,7 +424,8 @@ void Parser::procedureDefinition(const StopSet &sts)
   match(Symbol::PROC, stsUnion(stsUnion(stsTerminal(Symbol::ID), firstBlock), sts));
 
   int index = matchName(Symbol::ID, stsUnion(sts, firstBlock));
-  if (!table.insert(index, 0, 0, mKind::PROCKIND, mType::UNIV))
+  int procLabel = newLabel();
+  if (!table.insert(index, 0, 0, 0, procLabel, mKind::PROCKIND, mType::UNIV))
   {
     admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", laToken);
   }
@@ -410,8 +433,13 @@ void Parser::procedureDefinition(const StopSet &sts)
   {
     admin.fatal("Fatal error: exceeded block limit");
   }
+  int varLabel = newLabel();
+  int startLabel = newLabel();
 
-  block(sts);
+  admin.emit2("DEFADDR", procLabel);
+  admin.emit3("PROC", varLabel, startLabel);
+  block(sts, startLabel, varLabel);
+  admin.emit1("ENDPROC");
   table.endBlock();
 }
 
@@ -493,8 +521,10 @@ void Parser::emptyStatement(const StopSet &sts)
 void Parser::readStatement(const StopSet &sts)
 {
   printNT("Read Statement");
+  vector<mType> types;
   match(Symbol::READ, stsUnion(firstVariableAccessList, sts));
-  variableAccessList(sts);
+  types = variableAccessList(sts);
+  admin.emit2("READ", types.size());
 }
 
 vector<mType> Parser::variableAccessList(const StopSet &sts)
@@ -519,8 +549,10 @@ vector<mType> Parser::variableAccessList(const StopSet &sts)
 void Parser::writeStatement(const StopSet &sts)
 {
   printNT("Write Statement");
+  vector<mType> types;
   match(Symbol::WRITE, stsUnion(firstExpressionList, sts));
-  expressionList(sts);
+  types = expressionList(sts);
+  admin.emit2("WRITE", types.size());
 }
 
 vector<mType> Parser::expressionList(const StopSet &sts)
@@ -568,6 +600,7 @@ void Parser::assignmentStatement(const StopSet &sts)
   {
     admin.error(ErrorTypes::TypeError, "Type mismatch in assignment statement", laToken);
   }
+  admin.emit2("ASSIGN", varTypes.size());
 }
 
 void Parser::procedureStatement(const StopSet &sts)
@@ -583,46 +616,63 @@ void Parser::procedureStatement(const StopSet &sts)
   {
     admin.error(ErrorTypes::ScopeError, "Undefined procedure name", laToken);
   }
+  admin.emit3("CALL", table.currentBlockLevel() - t.getDepth(), t.getStartLabel());
 }
 
 void Parser::ifStatement(const StopSet &sts)
 {
   printNT("If Statement");
+  int startLabel = newLabel();
+  int doneLabel = newLabel();
+
   match(Symbol::IF, stsUnion(stsTerminal(Symbol::FI), stsUnion(firstGuardedCommandList, sts)));
-  guardedCommandList(stsUnion(stsTerminal(Symbol::FI), sts));
+  guardedCommandList(stsUnion(stsTerminal(Symbol::FI), sts), startLabel, doneLabel);
+  admin.emit2("DEFADDR", startLabel);
+  admin.emit2("FI", admin.getCurrentLine());
+  admin.emit2("DEFADDR", doneLabel);
   match(Symbol::FI, sts);
 }
 
 void Parser::doStatement(const StopSet &sts)
 {
   printNT("Do Statement");
+  int startLabel = newLabel();
+  int loopLabel = newLabel();
+
   match(Symbol::DO, stsUnion(stsTerminal(Symbol::OD), stsUnion(firstGuardedCommandList, sts)));
-  guardedCommandList(stsUnion(stsTerminal(Symbol::OD), sts));
+  admin.emit2("DEFADDR", loopLabel);
+  guardedCommandList(stsUnion(stsTerminal(Symbol::OD), sts), startLabel, loopLabel);
+  admin.emit2("DEFADDR", startLabel);
   match(Symbol::OD, sts);
 }
 
-void Parser::guardedCommandList(const StopSet &sts)
+void Parser::guardedCommandList(const StopSet &sts, int &startLabel, const int &goTo)
 {
   printNT("Guarded Command List");
-  guardedCommand(stsUnion(stsTerminal(Symbol::GUARDED_COMMAND), sts));
+  guardedCommand(stsUnion(stsTerminal(Symbol::GUARDED_COMMAND), sts), startLabel, goTo);
   while (member(laToken.getSname(), stsTerminal(Symbol::GUARDED_COMMAND)))
   {
     match(Symbol::GUARDED_COMMAND, stsUnion(firstGuardedCommand, sts));
-    guardedCommand(sts);
+    guardedCommand(sts, startLabel, goTo);
   }
 }
 
-void Parser::guardedCommand(const StopSet &sts)
+void Parser::guardedCommand(const StopSet &sts, int &startLabel, const int &goTo)
 {
   printNT("Guarded Command");
   mType type;
+
+  admin.emit2("DEFADDR", startLabel);
   type = expression(stsUnion(stsUnion(stsTerminal(Symbol::ARROW), firstStatementPart), sts));
+  startLabel = newLabel();
+  admin.emit2("ARROW", startLabel);
   if (type != mType::BOOL)
   {
     admin.error(ErrorTypes::TypeError, "Invalid primary expression type, should be boolean", laToken);
   }
   match(Symbol::ARROW, stsUnion(firstStatementPart, sts));
   statementPart(sts);
+  admin.emit2("BAR", goTo);
 }
 
 mType Parser::expression(const StopSet &sts)
@@ -637,27 +687,38 @@ mType Parser::expression(const StopSet &sts)
     {
       admin.error(ErrorTypes::TypeError, "Invalid primary expression type, should be boolean", laToken);
     }
-    primaryOperator(stsUnion(firstPrimaryExpression, sts));
+    Symbol s = primaryOperator(stsUnion(firstPrimaryExpression, sts));
     type2 = primaryExpression(sts);
     if (type2 != mType::BOOL)
     {
       admin.error(ErrorTypes::TypeError, "Invalid primary expression type, should be boolean", laToken);
     }
+    if (s == Symbol::AND_OPERATOR)
+    {
+      admin.emit1("AND");
+    }
+    else if (s == Symbol::OR_OPERATOR)
+    {
+      admin.emit1("OR");
+    }
   }
   return type1;
 }
 
-void Parser::primaryOperator(const StopSet &sts)
+Symbol Parser::primaryOperator(const StopSet &sts)
 {
   printNT("Primary Operator");
   bool parseError = false;
+  Symbol s;
   if (member(laToken.getSname(), stsTerminal(Symbol::AND_OPERATOR)))
   {
     match(Symbol::AND_OPERATOR, sts);
+    s = Symbol::AND_OPERATOR;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::OR_OPERATOR)))
   {
     match(Symbol::OR_OPERATOR, sts);
+    s = Symbol::OR_OPERATOR;
   }
   else
   {
@@ -671,6 +732,7 @@ void Parser::primaryOperator(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return s;
 }
 
 mType Parser::primaryExpression(const StopSet &sts)
@@ -678,6 +740,7 @@ mType Parser::primaryExpression(const StopSet &sts)
   printNT("Primary Expression");
   mType type1;
   mType type2;
+  Symbol s;
   type1 = simpleExpression(stsUnion(firstRelationalOperator, sts));
   if (member(laToken.getSname(), firstRelationalOperator))
   {
@@ -685,32 +748,48 @@ mType Parser::primaryExpression(const StopSet &sts)
     {
       admin.error(ErrorTypes::TypeError, "Invalid simple expression type, should be integer", laToken);
     }
-    relationalOperator(stsUnion(firstSimpleExpression, sts));
+    s = relationalOperator(stsUnion(firstSimpleExpression, sts));
     type2 = simpleExpression(sts);
     if (type2 != mType::INT)
     {
       admin.error(ErrorTypes::TypeError, "Invalid simple expression type, should be integer", laToken);
+    }
+    if (s == Symbol::LESS_THAN_OPERATOR)
+    {
+      admin.emit1("LESS");
+    }
+    else if (s == Symbol::EQUAL_OPERATOR)
+    {
+      admin.emit1("EQUAL");
+    }
+    else if (s == Symbol::GREATER_THAN_OPERATOR)
+    {
+      admin.emit1("GREATER");
     }
     return mType::BOOL;
   }
   return type1;
 }
 
-void Parser::relationalOperator(const StopSet &sts)
+Symbol Parser::relationalOperator(const StopSet &sts)
 {
   printNT("Relational Operator");
   bool parseError = false;
+  Symbol s;
   if (member(laToken.getSname(), stsTerminal(Symbol::LESS_THAN_OPERATOR)))
   {
     match(Symbol::LESS_THAN_OPERATOR, sts);
+    s = Symbol::LESS_THAN_OPERATOR;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::EQUAL_OPERATOR)))
   {
     match(Symbol::EQUAL_OPERATOR, sts);
+    s = Symbol::EQUAL_OPERATOR;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::GREATER_THAN_OPERATOR)))
   {
     match(Symbol::GREATER_THAN_OPERATOR, sts);
+    s = Symbol::GREATER_THAN_OPERATOR;
   }
   else
   {
@@ -724,6 +803,7 @@ void Parser::relationalOperator(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return s;
 }
 
 mType Parser::simpleExpression(const StopSet &sts)
@@ -733,6 +813,8 @@ mType Parser::simpleExpression(const StopSet &sts)
   mType type1;
   mType type2;
   bool parseError = false;
+  Symbol s;
+
   if (member(laToken.getSname(), stsTerminal(Symbol::SUBTRACTION_OPERATOR)))
   {
     match(Symbol::SUBTRACTION_OPERATOR, stsUnion(stsUnion(firstTerm, sts), firstAddingOperator));
@@ -743,11 +825,19 @@ mType Parser::simpleExpression(const StopSet &sts)
       {
         admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
-      addingOperator(stsUnion(firstTerm, sts));
+      s = addingOperator(stsUnion(firstTerm, sts));
       type2 = term(sts);
       if (type2 != mType::INT)
       {
         admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
+      }
+      if (s == Symbol::ADDITION_OPERATOR)
+      {
+        admin.emit1("ADD");
+      }
+      else if (s == Symbol::SUBTRACTION_OPERATOR)
+      {
+        admin.emit1("SUBTRACT");
       }
     }
   }
@@ -760,12 +850,20 @@ mType Parser::simpleExpression(const StopSet &sts)
       {
         admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
-      addingOperator(stsUnion(firstTerm, sts));
+      s = addingOperator(stsUnion(firstTerm, sts));
       type2 = term(sts);
       if (type2 != mType::INT)
       {
         admin.error(ErrorTypes::TypeError, "Invalid term type, should be integer", laToken);
       }
+    }
+    if (s == Symbol::ADDITION_OPERATOR)
+    {
+      admin.emit1("ADD");
+    }
+    else if (s == Symbol::SUBTRACTION_OPERATOR)
+    {
+      admin.emit1("SUBTRACT");
     }
   }
   else
@@ -783,17 +881,20 @@ mType Parser::simpleExpression(const StopSet &sts)
   return type1;
 }
 
-void Parser::addingOperator(const StopSet &sts)
+Symbol Parser::addingOperator(const StopSet &sts)
 {
   printNT("Adding Operator");
   bool parseError = false;
+  Symbol s;
   if (member(laToken.getSname(), stsTerminal(Symbol::ADDITION_OPERATOR)))
   {
     match(Symbol::ADDITION_OPERATOR, sts);
+    s = Symbol::ADDITION_OPERATOR;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::SUBTRACTION_OPERATOR)))
   {
     match(Symbol::SUBTRACTION_OPERATOR, sts);
+    s = Symbol::SUBTRACTION_OPERATOR;
   }
   else
   {
@@ -807,6 +908,7 @@ void Parser::addingOperator(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return s;
 }
 
 mType Parser::term(const StopSet &sts)
@@ -814,6 +916,7 @@ mType Parser::term(const StopSet &sts)
   printNT("Term");
   mType type1;
   mType type2;
+  Symbol s;
 
   type1 = factor(stsUnion(firstMultiplyingOperator, sts));
   while (member(laToken.getSname(), firstMultiplyingOperator))
@@ -822,31 +925,47 @@ mType Parser::term(const StopSet &sts)
     {
       admin.error(ErrorTypes::TypeError, "Invalid factor type, should be integer", laToken);
     }
-    multiplyingOperator(stsUnion(firstFactor, sts));
+    s = multiplyingOperator(stsUnion(firstFactor, sts));
     type2 = factor(sts);
     if (type2 != mType::INT)
     {
       admin.error(ErrorTypes::TypeError, "Invalid factor type, should be integer", laToken);
     }
+    if (s == Symbol::MULTIPLICATION_OPERATOR)
+    {
+      admin.emit1("MULTIPLY");
+    }
+    else if (s == Symbol::DIVISION_OPERATOR)
+    {
+      admin.emit1("DIVIDE");
+    }
+    else if (s == Symbol::MODULUS_OPERATOR)
+    {
+      admin.emit1("MODULO");
+    }
   }
   return type1;
 }
 
-void Parser::multiplyingOperator(const StopSet &sts)
+Symbol Parser::multiplyingOperator(const StopSet &sts)
 {
   printNT("Multiplying Operator");
   bool parseError = false;
+  Symbol s;
   if (member(laToken.getSname(), stsTerminal(Symbol::MULTIPLICATION_OPERATOR)))
   {
     match(Symbol::MULTIPLICATION_OPERATOR, sts);
+    s = Symbol::MULTIPLICATION_OPERATOR;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::DIVISION_OPERATOR)))
   {
     match(Symbol::DIVISION_OPERATOR, sts);
+    s = Symbol::DIVISION_OPERATOR;
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::MODULUS_OPERATOR)))
   {
     match(Symbol::MODULUS_OPERATOR, sts);
+    s = Symbol::MODULUS_OPERATOR;
   }
   else
   {
@@ -866,22 +985,36 @@ void Parser::multiplyingOperator(const StopSet &sts)
   {
     syntaxCheck(sts);
   }
+  return s;
 }
 
 mType Parser::factor(const StopSet &sts)
 {
   printNT("Factor");
   bool parseError = false;
-  int value;
+  int value = 0;
   mType type;
 
-  if (member(laToken.getSname(), firstVariableAccess))
+  int index = admin.getScanner().getSymbolTablePtr()->search(laToken.getSval().getLexeme());
+  if (index != -1)
   {
-    type = variableAccess(sts);
+    TableEntry t = table.searchTable(index);
+    if (t.getKind() == mKind::CONSTKIND)
+    {
+      int constValue = t.getConstVal();
+      constant(sts, constValue, type);
+      admin.emit2("CONSTANT", constValue);
+    }
+    else if (t.getKind() == mKind::ARRAYKIND || t.getKind() == mKind::VARKIND)
+    {
+      type = variableAccess(sts);
+      admin.emit1("VALUE");
+    }
   }
   else if (member(laToken.getSname(), firstConstant))
   {
     constant(sts, value, type);
+    admin.emit2("CONSTANT", value);
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::OPEN_PARENTHESIS)))
   {
@@ -893,6 +1026,7 @@ mType Parser::factor(const StopSet &sts)
   {
     match(Symbol::NOT_OPERATOR, stsUnion(firstFactor, sts));
     type = factor(sts);
+    admin.emit1("NOT");
   }
   else
   {
@@ -923,7 +1057,7 @@ mType Parser::variableAccess(const StopSet &sts)
   mType type;
   int index = matchName(Symbol::ID, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts));
   TableEntry t = table.searchTable(index);
-
+  admin.emit3("VARIABLE", table.currentBlockLevel() - t.getDepth(), t.getDisplacement());
   if (t.getIndex() != -1)
   {
     if (member(laToken.getSname(), firstIndexedSelector))
@@ -931,6 +1065,7 @@ mType Parser::variableAccess(const StopSet &sts)
       if (t.getKind() == mKind::ARRAYKIND)
       {
         type = indexedSelector(sts);
+        admin.emit3("INDEX", t.getArrSize(), admin.getCurrentLine());
         if (type != mType::INT)
         {
           admin.error(ErrorTypes::TypeError, "Indexed selector must be integer", laToken);
@@ -1031,4 +1166,14 @@ int Parser::booleanSymbol(const StopSet &sts)
     syntaxCheck(sts);
   }
   return value;
+}
+
+int Parser::newLabel()
+{
+  currentLabel++;
+  if (currentLabel > MAXLABEL)
+  {
+    admin.fatal("Fatal error: Exceeded maximum code generation label count");
+  }
+  return currentLabel;
 }

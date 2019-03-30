@@ -46,9 +46,7 @@ int main(int argc, char *argv[])
   else
   {
     cerr << "Compiler encountered " << administration.getErrorCount() << " error(s)" << endl;
-    cout << endl
-         << "Note: scanning and parsing errors are muted for clarity," << endl;
-    cout << "although they will still show in the error count" << endl;
+    cout << endl;
   }
 
   return 0;

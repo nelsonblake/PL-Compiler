@@ -26,7 +26,7 @@ public:
   // Public Methods
   bool searchBlock(const int &);
   TableEntry searchTable(const int &);
-  bool insert(const int &, const int &, const int &, const mKind &, const mType &);
+  bool insert(const int &, const int &, const int &, const int &, const int &, const mKind &, const mType &);
   int getConstantValue(const int &);
   bool newBlock();
   void endBlock();

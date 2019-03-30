@@ -85,3 +85,30 @@ void Administration::fatal(const string &s)
   cout << s << endl;
   exit(1);
 }
+
+void Administration::emit1(const string &opcode)
+{
+  if (errorCount == 0)
+  {
+    *outputFilePtr << opcode << endl;
+  }
+}
+
+void Administration::emit2(const string &opcode, const int &arg1)
+{
+  if (errorCount == 0)
+  {
+    *outputFilePtr << opcode << endl
+                   << arg1 << endl;
+  }
+}
+
+void Administration::emit3(const string &opcode, const int &arg1, const int &arg2)
+{
+  if (errorCount == 0)
+  {
+    *outputFilePtr << opcode << endl
+                   << arg1 << endl
+                   << arg2 << endl;
+  }
+}

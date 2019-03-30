@@ -27,13 +27,13 @@ bool BlockTable::searchBlock(const int &index)
   return false;
 }
 
-bool BlockTable::insert(const int &index, const int &arrSize, const int &constVal, const mKind &kind, const mType &type)
+bool BlockTable::insert(const int &index, const int &arrSize, const int &constVal, const int &disp, const int &startLabel, const mKind &kind, const mType &type)
 {
   bool canInsert = false;
   if (table.back().empty())
   {
     canInsert = true;
-    TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, kind, type);
+    TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, disp, startLabel, kind, type);
     table.back().push_back(entry);
   }
 
@@ -50,7 +50,7 @@ bool BlockTable::insert(const int &index, const int &arrSize, const int &constVa
     }
     if (canInsert)
     {
-      TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, kind, type);
+      TableEntry entry = TableEntry(index, arrSize, constVal, blockLevel, disp, startLabel, kind, type);
       table.back().push_back(entry);
     }
   }

@@ -16,9 +16,11 @@ TableEntry::TableEntry()
   depth = 0;
   kind = VARKIND;
   type = UNIV;
+  displacement = 0;
+  startLabel = 0;
 }
 
-TableEntry::TableEntry(const int &i, const int &a, const int &c, const int &d, const mKind &k, const mType &t)
+TableEntry::TableEntry(const int &i, const int &a, const int &c, const int &d, const int &disp, const int &sL, const mKind &k, const mType &t)
 {
   index = i;
   arrSize = a;
@@ -26,14 +28,8 @@ TableEntry::TableEntry(const int &i, const int &a, const int &c, const int &d, c
   depth = d;
   kind = k;
   type = t;
-}
-
-TableEntry::TableEntry(const int &i, const int &d, const mKind &k, const mType &t)
-{
-  index = i;
-  depth = d;
-  kind = k;
-  type = t;
+  displacement = disp;
+  startLabel = sL;
 }
 
 // Public Methods
@@ -67,6 +63,26 @@ mType TableEntry::getType()
   return type;
 }
 
+int TableEntry::getDisplacement()
+{
+  return displacement;
+}
+
+int TableEntry::getStartLabel()
+{
+  return startLabel;
+}
+
+void TableEntry::setDisplacement(const int &d)
+{
+  displacement = d;
+}
+
+void TableEntry::setStartLabel(const int &s)
+{
+  startLabel = s;
+}
+
 void TableEntry::printEntry()
 {
   cout << "Index: " << index << endl
@@ -75,5 +91,7 @@ void TableEntry::printEntry()
        << "Block level: " << depth << endl
        << "Kind: " << kind << endl
        << "Type: " << type << endl
+       << "Displacement: " << displacement << endl
+       << "Start Label: " << startLabel << endl
        << endl;
 }
