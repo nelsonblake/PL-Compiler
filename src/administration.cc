@@ -8,9 +8,10 @@
 #include "./administration.h"
 
 // Constructors
-Administration::Administration(ifstream &inputFile, Scanner &s) : scanner(s)
+Administration::Administration(ifstream &inputFile, ofstream &outputFile, Scanner &s) : scanner(s)
 {
   inputFilePtr = &inputFile;
+  outputFilePtr = &outputFile;
   currentLine = 1;
   errorCount = 0;
 }
@@ -24,6 +25,11 @@ Scanner Administration::getScanner()
 ifstream *Administration::getInputFilePtr()
 {
   return inputFilePtr;
+}
+
+ofstream *Administration::getOutputFilePtr()
+{
+  return outputFilePtr;
 }
 
 int Administration::getCurrentLine()
@@ -47,16 +53,16 @@ void Administration::error(const ErrorTypes &eType, const string &s, Token t)
   Token temp(t);
   if (eType == ErrorTypes::ScanError)
   {
-    // cout << endl
-    //      << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl
-    //      << endl;
+    cout << endl
+         << "Scanner encountered an error at line " << currentLine << ": " << s << ": " << temp.getSval().getLexeme() << endl
+         << endl;
   }
 
   else if (eType == ErrorTypes::ParseError)
   {
-    // cout << endl
-    //      << "Syntax error from parser at line " << currentLine << endl
-    //      << endl;
+    cout << endl
+         << "Syntax error from parser at line " << currentLine << endl
+         << endl;
   }
   else if (eType == ErrorTypes::ScopeError)
   {
