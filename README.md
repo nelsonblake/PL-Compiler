@@ -16,8 +16,6 @@ Time Tracking (Scanner):
 27/1/19 2 hours
 ```
 
-Total Time: 31 hours
-
 Time Tracking (Parser):
 
 ```
