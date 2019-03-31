@@ -9,6 +9,8 @@
 #include <fstream>
 #include "./administration.h"
 #include "./parser.h"
+#include "./Assembler.h"
+#include "./interp.h"
 
 int main(int argc, char *argv[])
 {
@@ -47,7 +49,19 @@ int main(int argc, char *argv[])
   {
     cerr << "Compiler encountered " << administration.getErrorCount() << " error(s)" << endl;
     cout << endl;
+    return 0;
   }
 
+  // Run the assembler
+  //ifstream assemblerInputFile("../test-output/docsExample.txt");
+  ifstream assemblerInputFile(argv[2]);
+  ofstream assemblerOutputFile("../test-output/assemblyCode.txt");
+  Assembler assembler(assemblerInputFile, assemblerOutputFile);
+  assembler.firstPass();
+  assembler.secondPass();
+
+  // Run the compiled program
+  //Interpreter interpreter("../test-output/executableExample.txt", false);
+  Interpreter interpreter("../test-output/assemblyCode.txt", false);
   return 0;
 }

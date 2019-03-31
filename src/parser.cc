@@ -1171,7 +1171,7 @@ int Parser::booleanSymbol(const StopSet &sts)
 int Parser::newLabel()
 {
   currentLabel++;
-  if (currentLabel > MAXLABEL)
+  if (currentLabel > MAXLABELCOUNT)
   {
     admin.fatal("Fatal error: Exceeded maximum code generation label count");
   }

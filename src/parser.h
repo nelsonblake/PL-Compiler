@@ -15,7 +15,7 @@
 #include "./firstSets.h"
 #include "./blockTable.h"
 
-#define MAXLABEL 256
+#define MAXLABELCOUNT 256
 
 using namespace std;
 

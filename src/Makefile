@@ -6,7 +6,7 @@ CCCFLAGS = -Wall -g -std=c++11 -lpthread
 
 all : plc
 
-plc : plc.o administration.o scanner.o parser.o symbolTable.o token.o attribute.o tableEntry.o blockTable.o
+plc : plc.o administration.o scanner.o parser.o symbolTable.o token.o attribute.o tableEntry.o blockTable.o interp.o Assembler.o
 	$(CCC) $(CCCFLAGS) -o $@ $^
 
 %.o : %.cc
@@ -27,6 +27,10 @@ attribute.o : attribute.h
 tableEntry.o : tableEntry.h
 
 blockTable.o : blockTable.h tableEntry.h
+
+interp.o : interp.h
+
+Assembler.o : Assembler.h
 
 clean:
 	rm -f *.o *~ *% *# .#*
