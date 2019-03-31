@@ -42,3 +42,9 @@ Time Tracking (Scope and Type Checking):
 24/3/19 2.5 hours
 ```
 
+Time Tracking (Code Generation):
+
+```
+30/3/19 4 hours
+31/3/19 1 hour
+```
