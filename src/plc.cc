@@ -9,7 +9,7 @@
 #include <fstream>
 #include "./administration.h"
 #include "./parser.h"
-#include "./Assembler.h"
+#include "./assembler.h"
 #include "./interp.h"
 
 int main(int argc, char *argv[])

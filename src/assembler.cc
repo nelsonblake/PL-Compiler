@@ -2,7 +2,7 @@
 
 using namespace std;
 #include <iostream>
-#include "Assembler.h"
+#include "assembler.h"
 
 // Simple constructor.
 Assembler::Assembler(istream &in, ostream &out)
