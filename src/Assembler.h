@@ -5,9 +5,7 @@
 
 using namespace std;
 #include <iostream>
-#include <string>
-
-const int MAXLABEL = 500;
+#include "parser.h"
 
 class Assembler
 {

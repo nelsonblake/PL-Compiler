@@ -1,9 +1,8 @@
 // Implementation of the assembler class.
 
+using namespace std;
 #include <iostream>
 #include "Assembler.h"
-#include <fstream>
-using namespace std;
 
 // Simple constructor.
 Assembler::Assembler(istream &in, ostream &out)
@@ -83,7 +82,6 @@ void Assembler::secondPass()
 {
 	string nextop;
 	(*insource) >> nextop;
-	// cout << "got: " << nextop << endl;
 	// Loop until ENDPROG.
 	for (;;)
 	{
@@ -285,10 +283,10 @@ void Assembler::secondPass()
 		else
 		{
 			// We should never see this message.
-			cerr << "Assembler encountered unknown operator \"" << nextop << "\"\n";
+			cerr << "Assembler encountered an unknown operator.  Bailing..."
+					 << endl;
 			exit(2);
 		}
 		(*insource) >> nextop;
-		//	   cout << "got: " << nextop << endl;
 	}
 }

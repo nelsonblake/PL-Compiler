@@ -53,15 +53,21 @@ int main(int argc, char *argv[])
   }
 
   // Run the assembler
-  //ifstream assemblerInputFile("../test-output/docsExample.txt");
   ifstream assemblerInputFile(argv[2]);
   ofstream assemblerOutputFile("../test-output/assemblyCode.txt");
   Assembler assembler(assemblerInputFile, assemblerOutputFile);
+
+  // Carry out the first pass
   assembler.firstPass();
+
+  // We must close the file after the first pass and re-open it to do the second pass
+  assemblerInputFile.close();
+  assemblerInputFile.open(argv[2]);
   assembler.secondPass();
 
   // Run the compiled program
   //Interpreter interpreter("../test-output/executableExample.txt", false);
   Interpreter interpreter("../test-output/assemblyCode.txt", false);
+
   return 0;
 }
