@@ -1,7 +1,16 @@
 begin
-  const b = true;
   integer i;
-  read i;
-  i := i + 1;
+
+  proc test
+    begin
+    const b = true;
+    integer i;
+    read i;
+    i := i + 1;
+    write i;
+  end;
+
+  call test;
+  i := 14;
   write i;
 end.
