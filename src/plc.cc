@@ -15,9 +15,10 @@
 int main(int argc, char *argv[])
 {
   // If incorrect arguments are specified:
-  if (argc != 3)
+  if (argc < 3 || argc > 4)
   {
-    cout << "Please use the following format: " << argv[0] << " <input-file> <output-file>" << endl;
+    cout << "Please use the following format: " << argv[0] << " <input-file> <output-file> <-s>" << endl;
+    cout << "Add option -s for stepping" << endl;
   }
 
   // Open input and output files
@@ -66,8 +67,14 @@ int main(int argc, char *argv[])
   assembler.secondPass();
 
   // Run the compiled program
-  //Interpreter interpreter("../test-output/executableExample.txt", false);
-  Interpreter interpreter("../test-output/assemblyCode.txt", false);
+  if (argc == 4 && string(argv[3]) == "-s")
+  {
+    Interpreter interpreter("../test-output/assemblyCode.txt", true);
+  }
+  else
+  {
+    Interpreter interpreter("../test-output/assemblyCode.txt", false);
+  }
 
   return 0;
 }

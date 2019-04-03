@@ -19,7 +19,7 @@ Interpreter::Interpreter(string filename, bool step)
   stepping = step;
   cout << " Loading..." << endl;
   load_program(filename);
-  cout << " Running ..." << endl;
+  cout << " Running..." << endl;
   run_program();
 }
 
