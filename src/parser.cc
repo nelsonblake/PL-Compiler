@@ -193,9 +193,7 @@ void Parser::program(const StopSet &sts)
   }
 
   block(sts, startLabel, varLabel);
-
   table.endBlock();
-
   match(Symbol::PERIOD, sts);
 
   // Emit the ENDPROG instruction
@@ -274,7 +272,7 @@ void Parser::constantDefinition(const StopSet &sts)
 
   match(Symbol::EQUAL_OPERATOR, stsUnion(sts, firstConstant));
   tempVal = laToken.getSval().getValue();
-  if (!table.insert(index, 0, tempVal, -1, -1, mKind::CONSTKIND, mType::INT))
+  if (!table.insert(index, 0, tempVal, 0, 0, mKind::CONSTKIND, mType::INT))
   {
     admin.error(ErrorTypes::ScopeError, "Ambiguous definition of constant", tempTok);
   }
@@ -305,7 +303,7 @@ int Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t, in
     indices = variableList(sts);
     for (unsigned int i = 0; i < indices.size(); i++)
     {
-      if (!table.insert(indices[i], 0, 0, varStart, 0, mKind::VARKIND, t))
+      if (!table.insert(indices[i], 1, 0, varStart, 0, mKind::VARKIND, t))
       {
         admin.error(ErrorTypes::ScopeError, "Ambiguous definition of variable", laToken);
       }
@@ -439,8 +437,8 @@ void Parser::procedureDefinition(const StopSet &sts)
   admin.emit2("DEFADDR", procLabel);
   admin.emit3("PROC", varLabel, startLabel);
   block(sts, startLabel, varLabel);
-  admin.emit1("ENDPROC");
   table.endBlock();
+  admin.emit1("ENDPROC");
 }
 
 void Parser::statementPart(const StopSet &sts)
