@@ -10,7 +10,7 @@ begin
     write i;
   end;
 
-  call test;
   i := 14;
+  call test;
   write i;
 end.
