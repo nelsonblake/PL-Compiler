@@ -1,4 +1,4 @@
-$ Test program from lecture
+$ Test program from lecture (results in stack overflow but assembler output matches)
 begin
   integer i, j, k;
   integer array f[2];

@@ -3,14 +3,30 @@ begin
 
   proc test
     begin
-    const b = true;
     integer i;
+    integer a, b;
+    Boolean c;
+    
     read i;
+    do ~(i > 0) ->
+      read i;
+    od;
+    
     i := i + 1;
     write i;
+
+    a := 2;
+    b := 3;
+    c := a > b;
+    
+    if
+      c -> write a; []
+      ~c -> write b;
+    fi;
+
   end;
 
-  i := 14;
+  i := 4;
   call test;
   write i;
 end.
