@@ -59,13 +59,26 @@ bool BlockTable::insert(const int &index, const int &arrSize, const int &constVa
 
 TableEntry BlockTable::searchTable(const int &index)
 {
-  for (unsigned int i = 0; i != table.size(); i++)
+  if (searchBlock(index) == true)
   {
-    for (unsigned int j = 0; j != table[i].size(); j++)
+    for (unsigned int i = 0; i != table.back().size(); i++)
     {
-      if (index == table[i][j].getIndex())
+      if (index == table.back()[i].getIndex())
       {
-        return table[i][j];
+        return table.back()[i];
+      }
+    }
+  }
+  else
+  {
+    for (unsigned int i = 0; i != table.size(); i++)
+    {
+      for (unsigned int j = 0; j != table[i].size(); j++)
+      {
+        if (index == table[i][j].getIndex())
+        {
+          return table[i][j];
+        }
       }
     }
   }

@@ -294,7 +294,7 @@ int Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t, in
 {
   vector<int> indices;
   int arrSize;
-
+  int returnValue = 0;
   printNT("Array or Variable List Definition");
   bool parseError = false;
 
@@ -309,6 +309,7 @@ int Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t, in
       }
       varStart++;
     }
+    returnValue = indices.size();
   }
   else if (member(laToken.getSname(), stsTerminal(Symbol::ARRAY)))
   {
@@ -351,6 +352,7 @@ int Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t, in
     mType type;
     constant(stsUnion(stsTerminal(Symbol::CLOSE_SQUARE_BRACKET), sts), value, type);
     match(Symbol::CLOSE_SQUARE_BRACKET, sts);
+    returnValue = arrSize;
   }
   else
   {
@@ -364,7 +366,7 @@ int Parser::arrayOrVariableListDefinition(const StopSet &sts, const mType &t, in
   {
     syntaxCheck(sts);
   }
-  return indices.size();
+  return returnValue;
 }
 
 mType Parser::typeSymbol(const StopSet &sts)
@@ -1055,7 +1057,9 @@ mType Parser::variableAccess(const StopSet &sts)
   mType type;
   int index = matchName(Symbol::ID, stsUnion(stsTerminal(Symbol::OPEN_SQUARE_BRACKET), sts));
   TableEntry t = table.searchTable(index);
-  admin.emit3("VARIABLE", table.currentBlockLevel() - t.getDepth(), t.getDisplacement());
+  int relativeDepth = table.currentBlockLevel() - t.getDepth();
+
+  admin.emit3("VARIABLE", relativeDepth, t.getDisplacement());
   if (t.getIndex() != -1)
   {
     if (member(laToken.getSname(), firstIndexedSelector))

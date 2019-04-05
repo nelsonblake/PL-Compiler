@@ -90,6 +90,7 @@ void Administration::emit1(const string &opcode)
 {
   if (errorCount == 0)
   {
+    // cout << opcode << endl;
     *outputFilePtr << opcode << endl;
   }
 }
@@ -98,6 +99,8 @@ void Administration::emit2(const string &opcode, const int &arg1)
 {
   if (errorCount == 0)
   {
+    // cout << opcode << endl
+    //      << arg1 << endl;
     *outputFilePtr << opcode << endl
                    << arg1 << endl;
   }
@@ -107,6 +110,9 @@ void Administration::emit3(const string &opcode, const int &arg1, const int &arg
 {
   if (errorCount == 0)
   {
+    // cout << opcode << endl
+    //      << arg1 << endl
+    //      << arg2 << endl;
     *outputFilePtr << opcode << endl
                    << arg1 << endl
                    << arg2 << endl;
