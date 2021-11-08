@@ -1,8 +1,11 @@
 # PLcompiler
 
 To run the program open your terminal and navigate to the project folder
+
 make plc
+
 plc
+
 
 Compiler design project for PL language (CPSC 4600)
 
