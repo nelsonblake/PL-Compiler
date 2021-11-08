@@ -1,5 +1,11 @@
 # PLcompiler
 
+To run:
+in terminal,
+navigate to project folder
+make plc
+plc
+
 Compiler design project for PL language (CPSC 4600)
 
 Time Tracking (Scanner):
