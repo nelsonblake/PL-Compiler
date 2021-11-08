@@ -1,8 +1,6 @@
 # PLcompiler
 
-To run:
-in terminal,
-navigate to project folder
+To run the program open your terminal and navigate to the project folder
 make plc
 plc
 
